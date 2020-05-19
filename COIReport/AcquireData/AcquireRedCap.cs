@@ -4,18 +4,23 @@ using System.Configuration;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Redcap;
 using Redcap.Models;
 
 namespace AcquireData
 {
-    class AcquireRedCap
+    public class AcquireRedCap
     {
         private static String token;
         private static string reportID;
         private static string apiURL;
         private static string RedCapResult;
 
+        static void Main(string[] args)
+        {
+            CreatePeopleList();
+        }
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
         /// </summary>
@@ -44,22 +49,29 @@ namespace AcquireData
         /// The purpose of this method is to create the 
         /// </summary>
         /// <returns></returns>
-        static IList<String> CreatePeopleList() {
+        public static IList<String> CreatePeopleList() {
             AcquireJSON();
             List<String> authors = new List<String>();
-             StreamReader streamReader = new StreamReader(RedCapResult);
-             using (JsonTextReader textReader = new JsonTextReader(streamReader))
+            StringReader baseReader = new StringReader(RedCapResult);
+            //we use the textReader here to be able to step through every object on its own in the large list of names
+             using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
             {
-                while (textReader.Read())
+                //Read moves it to the next token
+                while (jsonReader.Read())
                 {
-                    if(textReader.TokenType == JsonToken.StartObject)
+                    if(jsonReader.TokenType == JsonToken.StartObject)
                     {
+                        //grab the current token that we're on from the JSonReader
+                        JObject currentToken = JObject.Load(jsonReader);
+                        JsonSerializer serializer = new JsonSerializer();
                         //What to do here
                         //Get the person
                         //find the person in a dicionary
                         //If present, update the person with the parts that are present
                         //When changing from one authorship to the next, add the (hopefully) complete person to the list
-                        Person newAuthor = 
+
+                        //This line is operating as expected, now need to look at how to combine people
+                        Person newAuthor = (Person)serializer.Deserialize(new JTokenReader(currentToken), typeof(Person));
                     }
                 }
             }
