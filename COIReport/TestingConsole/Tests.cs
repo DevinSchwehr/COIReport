@@ -28,12 +28,12 @@ namespace RedcapApiDemo
             var redcap_api = new RedcapApi(apiURL);
 
             Console.WriteLine("Exporting Report.");
-            var result = redcap_api.ExportReportsAsync(token, int.Parse(reportID)).Result;
+            var result = redcap_api.ExportReportsAsync(token, int.Parse(reportID), Redcap.Models.ReturnFormat.json).Result;
 
             //Current problems with receiving data. JSON breaks every line down as an object when it's not supposed to. Because of this,
             //I would have to go into each 'person' created and find what chunk of an actual Person it contains.
-            var data = JsonConvert.DeserializeObject(result);
-            Console.WriteLine(data);
+             var data = JsonConvert.DeserializeObject(result);
+             Console.WriteLine(data);
             Console.ReadLine();
 
         }
