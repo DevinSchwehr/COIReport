@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using AcquireData.Properties;
 using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Redcap;
@@ -10,17 +12,13 @@ using Redcap.Models;
 
 namespace AcquireData
 {
-    public class AcquireRedCap
+    public class GetRedcapData
     {
         private static String token;
         private static string reportID;
         private static string apiURL;
         private static string RedCapResult;
 
-        static void Main(string[] args)
-        {
-            CreatePeopleList();
-        }
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
         /// </summary>
@@ -28,7 +26,7 @@ namespace AcquireData
         {
             //These lines are for looking at the secrets file and getting the info to make contact with the RedCap API
             var builder = new ConfigurationBuilder();
-            builder.AddUserSecrets<AcquireRedCap>();
+            builder.AddUserSecrets<GetRedcapData>();
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
             token = SelectedSecrets["APIToken"];
@@ -81,5 +79,33 @@ namespace AcquireData
         }
 
 
+    }
+
+    /// <summary>
+    /// This class is responsible for pulling data from the OPD and will be responsible for searching through it when looking for a specific name.
+    /// </summary>
+    public class GetOpdData
+    {
+        /// <summary>
+        /// This method right now is pretty barebones. As of now it just looks through the one OPD file I have, and just starts pulling names
+        /// and putting it into a string array. This is just the base, in the future I'll be implementing search restrictions
+        /// and will be searching through more than just the one file.
+        /// </summary>
+        public static void ParseOPD()
+        {
+            using (TextFieldParser parser = new TextFieldParser(@"C:\Users\devin\OneDrive\Documents\COI Report\OP_DTL_GNRL_PGYR2017_P01172020.csv"))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    string[] fields = parser.ReadFields();
+                    foreach(string field in fields)
+                    {
+
+                    }
+                }
+            }
+        }
     }
 }
