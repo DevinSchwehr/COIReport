@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace AcquireData
 {
     public class Person
     {
-        private string authorshipNumber;
-        private string first { get; set; }
-        private string middle { get; set; }
-        private string last { get; set; }
+        public int authorshipNumber;
+        public string first { get; set; }
+        public string middle { get; set; }
+        public string last { get; set; }
         private string clincalDegree { get; set; }
         private string otherDegree { get; set; }
         private string USLocation { get; set; }
@@ -48,7 +49,7 @@ namespace AcquireData
             string uslocation, string institution, string city, string state, string type3, string freetexttypeother3, string entity3,
             string freetextentityother3, string articlenumber, string journal, string receivedate)
         {
-            this.authorshipNumber = authorshipnumber;
+            this.authorshipNumber = int.Parse(authorshipnumber);
             this.first = first;
             this.middle = middle;
             this.last = last;
@@ -65,6 +66,51 @@ namespace AcquireData
             this.articleNumber = articlenumber;
             this.journal = journal;
             this.receivedate = receivedate;
+        }
+
+        /// <summary>
+        /// This method uses the BlankCheck method to compare the current variable values to that of the 'new' author.
+        /// The 'new' author is really just the same author, but with more information
+        /// </summary>
+        /// <param name="newAuthor"></param>
+        /// <returns></returns>
+        internal Person CheckAndMerge(Person newAuthor)
+        {
+            //if(first.Equals("") && !newAuthor.first.Equals("")) { first = newAuthor.first; }
+            first = BlankCheck(first, newAuthor.first);
+            middle = BlankCheck(middle, newAuthor.middle);
+            last = BlankCheck(last, newAuthor.last);
+            clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
+            otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
+            USLocation = BlankCheck(USLocation, newAuthor.USLocation);
+            institution = BlankCheck(institution, newAuthor.institution);
+            city = BlankCheck(city, newAuthor.city);
+            state = BlankCheck(state, newAuthor.state);
+            Involvement = BlankCheck(Involvement, newAuthor.Involvement);
+            otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
+            companiesNumbered = BlankCheck(companiesNumbered, newAuthor.companiesNumbered);
+            otherCompanies = BlankCheck(otherCompanies, newAuthor.otherCompanies);
+            articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
+            journal = BlankCheck(journal, newAuthor.journal);
+            receivedate = BlankCheck(receivedate, newAuthor.receivedate);
+            return this;
+
+        }
+
+        /// <summary>
+        /// This method compares two strings, and if the currentvariable is blank it returns the other variable.
+        /// Otherwise, it just returns the currentvariable.
+        /// </summary>
+        /// <param name="currentVariable"></param>
+        /// <param name="newVariable"></param>
+        /// <returns></returns>
+        private string BlankCheck(string currentVariable, string newVariable)
+        {
+            if(currentVariable.Equals("") && !(newVariable.Equals("")))
+            {
+                return newVariable;
+            }
+            return currentVariable;
         }
     }
 }

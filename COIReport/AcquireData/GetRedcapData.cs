@@ -18,6 +18,7 @@ namespace AcquireData
         private static string reportID;
         private static string apiURL;
         private static string RedCapResult;
+        private static Dictionary<int, Person> authorshipDictionary;
 
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
@@ -70,6 +71,10 @@ namespace AcquireData
 
                         //This line is operating as expected, now need to look at how to combine people
                         Person newAuthor = (Person)serializer.Deserialize(new JTokenReader(currentToken), typeof(Person));
+                        if (authorshipDictionary.ContainsKey(newAuthor.authorshipNumber) && authorshipDictionary.TryGetValue(newAuthor.authorshipNumber, out Person oldAuthor))
+                        {
+                            oldAuthor = oldAuthor.CheckAndMerge(newAuthor);
+                        }
                     }
                 }
             }
