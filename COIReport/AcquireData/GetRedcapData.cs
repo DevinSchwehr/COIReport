@@ -48,10 +48,11 @@ namespace AcquireData
         /// The purpose of this method is to create the 
         /// </summary>
         /// <returns></returns>
-        public static IList<String> CreatePeopleList() {
+        public static IList<Person> CreatePeopleList() {
             AcquireJSON();
-            List<String> authors = new List<String>();
+            List<Person> authors = new List<Person>();
             StringReader baseReader = new StringReader(RedCapResult);
+            authorshipDictionary = new Dictionary<int, Person>();
             //we use the textReader here to be able to step through every object on its own in the large list of names
              using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
             {
@@ -75,8 +76,16 @@ namespace AcquireData
                         {
                             oldAuthor = oldAuthor.CheckAndMerge(newAuthor);
                         }
+                        else
+                        {
+                            authorshipDictionary.Add(newAuthor.authorshipNumber, newAuthor);
+                        }
                     }
                 }
+            }
+             foreach(Person author in authorshipDictionary.Values)
+            {
+                authors.Add(author);
             }
 
             return authors;

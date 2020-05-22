@@ -23,7 +23,14 @@ namespace AcquireData
         private string otherCompanies { get; set; }
         private string articleNumber { get; set; }
         private string journal { get; set; }
-        private string receivedate { get; set; }
+        private string receiveddate { get; set; }
+        private string volume { get; set; }
+        private string issue { get; set; } 
+        private string pubyear { get; set; }
+        private string pubmonth { get; set; }
+
+        private string articleTitle { get; set; }
+
 
         /// <summary>
         /// This is a public constructor that will be creating different Person objects from the JSON parsing
@@ -47,7 +54,7 @@ namespace AcquireData
         /// <param name="receivedate">the date the journal was received</param>
         public Person(string authorshipnumber, string first, string middle, string last, string clinicaldegree, string freetextdegreeother,
             string uslocation, string institution, string city, string state, string type3, string freetexttypeother3, string entity3,
-            string freetextentityother3, string articlenumber, string journal, string receivedate)
+            string freetextentityother3, string articlenumber, string journal, string receiveddate, string volume, string issue, string pubyear, string pubmonth, string title)
         {
             this.authorshipNumber = int.Parse(authorshipnumber);
             this.first = first;
@@ -65,7 +72,12 @@ namespace AcquireData
             this.otherCompanies = freetextentityother3;
             this.articleNumber = articlenumber;
             this.journal = journal;
-            this.receivedate = receivedate;
+            this.receiveddate = receiveddate;
+            this.volume = volume;
+            this.issue = issue;
+            this.pubyear = pubyear;
+            this.pubmonth = pubmonth;
+            this.articleTitle = title;
         }
 
         /// <summary>
@@ -92,7 +104,13 @@ namespace AcquireData
             otherCompanies = BlankCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
-            receivedate = BlankCheck(receivedate, newAuthor.receivedate);
+            receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);
+            volume = BlankCheck(volume, newAuthor.volume);
+            issue = BlankCheck(issue, newAuthor.issue);
+            pubyear = BlankCheck(pubyear, newAuthor.pubyear);
+            pubmonth = BlankCheck(pubmonth, newAuthor.pubmonth);
+            articleTitle = BlankCheck(articleTitle, newAuthor.articleTitle);
+
             return this;
 
         }

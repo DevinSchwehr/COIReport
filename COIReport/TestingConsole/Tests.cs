@@ -16,7 +16,7 @@ namespace RedcapApiDemo
         {
 
             AcquireData.GetRedcapData.CreatePeopleList();
-            AcquireData.GetOpdData.ParseOPD();
+          //  AcquireData.GetOpdData.ParseOPD();
             //var builder = new ConfigurationBuilder();
             //builder.AddUserSecrets<TestsWithConsole>();
             //IConfigurationRoot Configuration = builder.Build();
