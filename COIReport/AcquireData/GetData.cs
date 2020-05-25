@@ -12,7 +12,7 @@ using Redcap.Models;
 
 namespace AcquireData
 {
-    public class GetRedcapData
+    public class GetData
     {
         private static String token;
         private static string reportID;
@@ -27,7 +27,7 @@ namespace AcquireData
         {
             //These lines are for looking at the secrets file and getting the info to make contact with the RedCap API
             var builder = new ConfigurationBuilder();
-            builder.AddUserSecrets<GetRedcapData>();
+            builder.AddUserSecrets<GetData>();
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
             token = SelectedSecrets["APIToken"];
@@ -104,22 +104,55 @@ namespace AcquireData
         /// This method right now is pretty barebones. As of now it just looks through the one OPD file I have, and just starts pulling names
         /// and putting it into a string array. This is just the base, in the future I'll be implementing search restrictions
         /// and will be searching through more than just the one file.
+        /// 
+        /// I am going to retrofit this method to be the groundwork for the search protocol. It is going to find all of the names, put them
+        /// into a list, and then return it to be reviewed.
+        /// 
+        /// Things to know for parsing (Post 2016)
+        /// 5 = Physician ID
+        /// 6 = First Name
+        /// 7 = Middle Name
+        /// 8 = Last Name
+        /// 12 = Recipient City
+        /// 13 = Recipient State
         /// </summary>
-        public static void ParseOPD()
+        public static IList<String[]> FindPeopleFromOPD(string first,string last, string middle, string city, string state, string filepath)
         {
-            using (TextFieldParser parser = new TextFieldParser(@"C:\Users\devin\OneDrive\Documents\COI Report\OP_DTL_GNRL_PGYR2017_P01172020.csv"))
+            List<String[]> matches = new List<String[]>();
+            using (TextFieldParser parser = new TextFieldParser(filepath))
             {
                 parser.TextFieldType = FieldType.Delimited;
                 parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
+                    //fields is an array that contains all of the data for the current line in the csv.
                     string[] fields = parser.ReadFields();
-                    foreach(string field in fields)
+                    //If the first and last name in the row match the given name, put it in the list.
+                    if(fields[6].Equals(first) && fields[8].Equals(last))
                     {
-
+                        matches.Add(fields);
                     }
                 }
             }
+            bool allSameID = true;
+            string physicianID = matches[0][5];
+            //This loop is to check if the list has only one physician or not.
+            foreach(string[] row in matches)
+            {
+                if (!(row[5].Equals(physicianID)))
+                {
+                    allSameID = false;
+                    break;
+                }
+            }
+            //If all of the physicians have the same ID, then return the list.
+            if (allSameID)
+            {
+                return matches;
+            }
+            //If they don't let's remove those from the list who don't come from the same city and state
+            //Note: we have to bring in the dictionary.. The person's city and state will be in numbers.
+
         }
     }
 }
