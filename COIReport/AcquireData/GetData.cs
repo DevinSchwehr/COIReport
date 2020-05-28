@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using AcquireData.Properties;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.VisualBasic.FileIO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Redcap;
-using Redcap.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace AcquireData
 {
@@ -18,12 +15,17 @@ namespace AcquireData
         private static string reportID;
         private static string apiURL;
         private static string RedCapResult;
+        private static string MetaDataResult;
         private static Dictionary<int, Person> authorshipDictionary;
+        static Dictionary<int, string> clinicalDegrees;
+        static Dictionary<int, string> stateDictionary;
+        static Dictionary<int ,string> companyDictionary;
+        static Dictionary<int, string> typeDictionary;
 
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
         /// </summary>
-        static void AcquireJSON()
+        static void AcquireJSONAndMetaData()
         {
             //These lines are for looking at the secrets file and getting the info to make contact with the RedCap API
             var builder = new ConfigurationBuilder();
@@ -36,8 +38,12 @@ namespace AcquireData
 
             var redcap_api = new RedcapApi(apiURL);
 
-            //This is all of the RedCapData!
+            string[] metadataFields = { "clinicaldegree", "entity3", "state", "type3" };
+
+            //This is all of the RedCapData, including the data dictionary!
             RedCapResult = redcap_api.ExportReportsAsync(token, int.Parse(reportID), Redcap.Models.ReturnFormat.json).Result;
+            MetaDataResult = redcap_api.ExportMetaDataAsync(token, Redcap.Models.ReturnFormat.csv, metadataFields).Result;
+
 
             //Current problems with receiving data. JSON breaks every line down as an object when it's not supposed to. Because of this,
             //I would have to go into each 'person' created and find what chunk of an actual Person it contains.
@@ -49,7 +55,7 @@ namespace AcquireData
         /// </summary>
         /// <returns></returns>
         public static IList<Person> CreatePeopleList() {
-            AcquireJSON();
+            AcquireJSONAndMetaData();
             List<Person> authors = new List<Person>();
             StringReader baseReader = new StringReader(RedCapResult);
             authorshipDictionary = new Dictionary<int, Person>();
@@ -89,6 +95,17 @@ namespace AcquireData
             }
 
             return authors;
+
+        }
+
+        public static void CreateDictionaries()
+        {
+            AcquireJSONAndMetaData();
+            String[] splitString = MetaDataResult.Split('"');
+            //Next Steps:
+            //Break apart the three elements containing the actual pairs, separating by '|'
+            //then add elements into respective dictionary by breaking apart with ',', element 0 is key, element 2 is value.
+
 
         }
 
@@ -150,6 +167,7 @@ namespace AcquireData
             {
                 return matches;
             }
+            return matches;
             //If they don't let's remove those from the list who don't come from the same city and state
             //Note: we have to bring in the dictionary.. The person's city and state will be in numbers.
 
