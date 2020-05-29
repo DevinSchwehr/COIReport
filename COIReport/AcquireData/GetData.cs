@@ -98,14 +98,64 @@ namespace AcquireData
 
         }
 
+        /// <summary>
+        /// element 3 = Clinical Degree
+        /// Element 9 = States
+        /// Element 21, 23, 25 = Type
+        /// Element 37 = Companies
+        /// </summary>
         public static void CreateDictionaries()
         {
+            clinicalDegrees = new Dictionary<int, string>();
+            stateDictionary = new Dictionary<int, string>();
+            companyDictionary = new Dictionary<int, string>();
+            typeDictionary = new Dictionary<int, string>();
             AcquireJSONAndMetaData();
             String[] splitString = MetaDataResult.Split('"');
             //Next Steps:
             //Break apart the three elements containing the actual pairs, separating by '|'
             //then add elements into respective dictionary by breaking apart with ',', element 0 is key, element 2 is value.
-
+            string[] degrees = splitString[3].Split('|');
+            //Have to do some special scenarios for degrees as there are values with commas within them
+            foreach(string pair in degrees)
+            {
+                string[] splitPair = pair.Split(',');
+                if(splitPair.Length > 2)
+                {
+                    string ConcateValue = "";
+                    for(int counter = 1; counter <splitPair.Length; counter++)
+                    {
+                        ConcateValue += splitPair[counter];
+                    }
+                    clinicalDegrees.Add(int.Parse(splitPair[0]), ConcateValue);
+                }
+                else
+                {
+                clinicalDegrees.Add(int.Parse(splitPair[0]), splitPair[1]);
+                }
+            }
+            //Repeating the same process for states, however it is easier as it will always fit into an array of 2 if you split on comma.
+            string[] states = splitString[9].Split('|');
+            foreach(string pair in states)
+            {
+                string[] splitPair = pair.Split(",");
+                stateDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+            }
+            //Same routine as was used for states, but for the types of involvement with companies.
+            string allTypes = splitString[21] + splitString[23] + splitString[25];
+            string[] types = allTypes.Split('|');
+            foreach(string pair in types)
+            {
+                string[] splitPair = pair.Split(',');
+                typeDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+            }
+            //Same deal for the past two, but with the companies.
+            string[] companies = splitString[37].Split('|');
+            foreach(string pair in companies)
+            {
+                string[] splitPair = pair.Split(',');
+                companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+            }
 
         }
 
