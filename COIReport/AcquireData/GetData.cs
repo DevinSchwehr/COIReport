@@ -17,10 +17,10 @@ namespace AcquireData
         private static string RedCapResult;
         private static string MetaDataResult;
         private static Dictionary<int, Person> authorshipDictionary;
-        static Dictionary<int, string> clinicalDegrees;
-        static Dictionary<int, string> stateDictionary;
-        static Dictionary<int ,string> companyDictionary;
-        static Dictionary<int, string> typeDictionary;
+        internal static Dictionary<int, string> clinicalDegrees;
+        internal static Dictionary<int, string> stateDictionary;
+        internal static Dictionary<int ,string> companyDictionary;
+        internal static Dictionary<int, string> typeDictionary;
 
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
@@ -203,23 +203,46 @@ namespace AcquireData
             }
             bool allSameID = true;
             string physicianID = matches[0][5];
-            //This loop is to check if the list has only one physician or not.
-            foreach(string[] row in matches)
-            {
-                if (!(row[5].Equals(physicianID)))
-                {
-                    allSameID = false;
-                    break;
-                }
-            }
+            //This private helper method will check if all of the ID's in the list are the same.
+            allSameID = IDChecker(physicianID, matches);
             //If all of the physicians have the same ID, then return the list.
             if (allSameID)
             {
                 return matches;
             }
-            return matches;
-            //If they don't let's remove those from the list who don't come from the same city and state
-            //Note: we have to bring in the dictionary.. The person's city and state will be in numbers.
+            //Otherwise, get more specific
+            else
+            {
+                List<string[]> duplicateMatches = matches;
+                foreach(string[] author in duplicateMatches)
+                {
+                    //If the author doesn't have the same city or state, remove them. This will ensure that only those from the same city and state will stay in the list.
+                    if(!(author[12].Equals(city)) || !(author[13].Equals(state))) { matches.Remove(author); }
+                }
+                //Now do another check to see if everyone has the same physician id
+                physicianID = matches[0][5];
+                allSameID = IDChecker(physicianID, matches);
+                //If they all now have the same ID, then return the list
+                if (allSameID) { return matches; }
+                else
+                {
+                    //If you still cannot narrow down the list to one physician, throw an error.
+                    throw new ArgumentException("Error: Could not narrow list down to one candidate.");
+                }
+
+            }
+        }
+
+        private static bool IDChecker(string ID, List<String[]> authors)
+        {
+            foreach (string[] row in authors)
+            {
+                if (!(row[5].Equals(ID)))
+                {
+                    return false;
+                }
+            }
+            return true;
 
         }
     }

@@ -9,4 +9,8 @@
     <PackageReference Include="RedcapAPI" Version="1.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AcquireData\AcquireData.csproj" />
+  </ItemGroup>
+
 </Project>
