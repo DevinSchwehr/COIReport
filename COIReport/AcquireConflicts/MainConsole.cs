@@ -26,7 +26,22 @@ namespace RedcapApiDemo
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             foreach(Person author in authors)
             {
-
+                //What I want to do in this loop.
+                //Break down the author to get parameters for FindPeopleFromOPD
+                //need to convert state from number to string using metadata.
+                //then need to try to do the method and catch any exceptions.
+                //if no exceptions caught, then do comparisons.
+                //Repeat this for all 3 categories of payments for every year.
+                try
+                {
+                    List<String[]> results =  (List<String[]>)GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                    "OP_DTL_GNRL_PGYR2018_P01172020.csv");
+                    AnalyzeOPDList(results, author);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 

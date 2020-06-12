@@ -17,10 +17,10 @@ namespace AcquireData
         private static string RedCapResult;
         private static string MetaDataResult;
         private static Dictionary<int, Person> authorshipDictionary;
-        internal static Dictionary<int, string> clinicalDegrees;
-        internal static Dictionary<int, string> stateDictionary;
-        internal static Dictionary<int ,string> companyDictionary;
-        internal static Dictionary<int, string> typeDictionary;
+        public static Dictionary<int, string> clinicalDegrees;
+        public static Dictionary<int, string> stateDictionary;
+        public static Dictionary<int ,string> companyDictionary;
+        public static Dictionary<int, string> typeDictionary;
 
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
@@ -165,7 +165,7 @@ namespace AcquireData
     /// <summary>
     /// This class is responsible for pulling data from the OPD and will be responsible for searching through it when looking for a specific name.
     /// </summary>
-    public class GetOpdData
+    public static class GetOpdData
     {
         /// <summary>
         /// This method right now is pretty barebones. As of now it just looks through the one OPD file I have, and just starts pulling names
@@ -201,6 +201,11 @@ namespace AcquireData
                     }
                 }
             }
+            //If the size of the list is zero it will simply throw an error saying it could not find anybody
+            if(matches.Count == 0)
+            {
+                throw new ArgumentException("Error. Did Not find anybody with the same first and last name.");
+            }
             bool allSameID = true;
             string physicianID = matches[0][5];
             //This private helper method will check if all of the ID's in the list are the same.
@@ -217,7 +222,8 @@ namespace AcquireData
                 foreach(string[] author in duplicateMatches)
                 {
                     //If the author doesn't have the same city or state, remove them. This will ensure that only those from the same city and state will stay in the list.
-                    if(!(author[12].Equals(city)) || !(author[13].Equals(state))) { matches.Remove(author); }
+                  //  if(!(author[12].Equals(city)) || !(author[13].Equals(state))) { matches.Remove(author); }
+                  if(!(author[12].Equals(city) && author[13].Equals(state))) { matches.Remove(author); }
                 }
                 //Now do another check to see if everyone has the same physician id
                 physicianID = matches[0][5];

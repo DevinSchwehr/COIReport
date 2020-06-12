@@ -15,8 +15,8 @@ namespace AcquireData
         private string otherDegree { get; set; }
         private string USLocation { get; set; }
         private string institution { get; set; }
-        private string city { get; set; }
-        private string state { get; set; }
+        public string city { get; set; }
+        public string state { get; set; }
         private string  Involvement { get; set; }
         private string otherInvolvement { get; set; }
         private string companiesNumbered { get; set; }
