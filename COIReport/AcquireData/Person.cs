@@ -23,7 +23,7 @@ namespace AcquireData
         private string otherCompanies { get; set; }
         private string articleNumber { get; set; }
         private string journal { get; set; }
-        private string receiveddate { get; set; }
+        public string receiveddate { get; set; }
         private string volume { get; set; }
         private string issue { get; set; } 
         private string pubyear { get; set; }
@@ -57,14 +57,14 @@ namespace AcquireData
             string freetextentityother3, string articlenumber, string journal, string receiveddate, string volume, string issue, string pubyear, string pubmonth, string title)
         {
             this.authorshipNumber = int.Parse(authorshipnumber);
-            this.first = first;
-            this.middle = middle;
-            this.last = last;
+            this.first = first.ToUpper();
+            this.middle = middle.ToUpper();
+            this.last = last.ToUpper();
             this.clincalDegree = clinicaldegree;
             this.otherDegree = freetextdegreeother;
             this.USLocation = uslocation;
             this.institution = institution;
-            this.city = city;
+            this.city = city.ToUpper();
             this.state = state;
             this.Involvement = type3;
             this.otherInvolvement = freetexttypeother3;

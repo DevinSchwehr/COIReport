@@ -139,7 +139,7 @@ namespace AcquireData
             foreach(string pair in states)
             {
                 string[] splitPair = pair.Split(",");
-                stateDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+                stateDictionary.Add(int.Parse(splitPair[0]), GetStateAbbreviation(splitPair[1]));
             }
             //Same routine as was used for states, but for the types of involvement with companies.
             string allTypes = splitString[21] + splitString[23] + splitString[25];
@@ -159,7 +159,77 @@ namespace AcquireData
 
         }
 
-
+        /// <summary>
+        /// The purpose of this method is to convert the full state names from the metadata into their abbreviations to be found within the OPD, as it uses abbreviations.
+        /// </summary>
+        /// <param name="state">the state</param>
+        /// <returns>its abbreviation</returns>
+        private static string GetStateAbbreviation(string state)
+        {
+            switch (state) 
+            {
+                case " Alabama ": return "AL";
+                case " Alaska ": return "AK";
+                case " Arizona ": return "AZ";
+                case " Arkansas ": return "AR";
+                case " California ": return "CA";
+                case " Colorado ": return "CO";
+                case " Connecticut ":return "CT";
+                case " Delaware ": return "DE";
+                case " Florida ": return "FL";
+                case " Georgia ": return "GA";
+                case " Hawaii ": return "HI";
+                case " Idaho ": return "ID";
+                case " Illinois ": return "IL";
+                case " Indiana ": return "IN";
+                case " Iowa ": return "IA";
+                case " Kansas ": return "KS";
+                case " Kentucky ": return "KY";
+                case " Louisiana ": return "LA";
+                case " Maine ": return "ME";
+                case " Maryland ": return "MD";
+                case " Massachusetts ": return "MA";
+                case " Michigan ": return "MI";
+                case " Minnesota ": return "MN";
+                case " Mississippi ": return "MS";
+                case " Missouri ": return "MS";
+                case " Montana ": return "MT";
+                case " Nebraska ": return "NE";
+                case " Nevada ": return "NV";
+                case " New Hampshire ": return "NH";
+                case " New Jersey ": return "NJ";
+                case " New Mexico ": return "NM";
+                case " New York ": return "NY";
+                case " North Carolina ": return "NC";
+                case " North Dakota ": return "ND";
+                case " Ohio ": return "OH";
+                case " Oklahoma ": return "OK";
+                case " Oregon ": return "OR";
+                case " Pennsylvania ": return "PA";
+                case " Rhode Island ": return "RI";
+                case " South Carolina ": return "SC";
+                case " South Dakota ": return "SD";
+                case " Tennessee ": return "TN";
+                case " Texas ": return "TX";
+                case " Utah ": return "UT";
+                case " Vermont ": return "VT";
+                case " Virginia ": return "VA";
+                case " Washington ": return "WA";
+                case " West Virginia ": return "WV";
+                case " Wisconsin ": return "WI";
+                case " Wyoming ": return "WY";
+                case " American Samoa ": return "AS";
+                case " District of Columbia ": return "DC";
+                case " Federated States of Micronesia ": return "FM";
+                case " Guam ": return "GU";
+                case " Marshall Islands ": return "MH";
+                case " Northern Mariana Islands ": return "MP";
+                case " Palau": return "PW";
+                case " Puerto Rico ": return "PR";
+                case " Virgin Islands": return "VI";
+            }
+            throw new Exception("State not found");
+        }
     }
 
     /// <summary>
@@ -202,9 +272,11 @@ namespace AcquireData
                 }
             }
             //If the size of the list is zero it will simply throw an error saying it could not find anybody
+            //EDIT: We are simply going to return the empty list so that it doesn't exit in the other method.
             if(matches.Count == 0)
             {
-                throw new ArgumentException("Error. Did Not find anybody with the same first and last name.");
+                // throw new ArgumentException("Error. Did Not find anybody with the same first and last name from OPD.");
+                return matches;
             }
             bool allSameID = true;
             string physicianID = matches[0][5];

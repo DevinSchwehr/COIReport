@@ -31,18 +31,67 @@ namespace RedcapApiDemo
                 //need to convert state from number to string using metadata.
                 //then need to try to do the method and catch any exceptions.
                 //if no exceptions caught, then do comparisons.
-                //Repeat this for all 3 categories of payments for every year.
+                //Repeat this for all 3 categories of payments for 4 years back from the receive date
+                List<String[]> results = new List<String[]>();
                 try
                 {
-                    List<String[]> results =  (List<String[]>)GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                    "OP_DTL_GNRL_PGYR2018_P01172020.csv");
-                    AnalyzeOPDList(results, author);
+                    string[] dates = author.receiveddate.Split('-');
+                    int year = int.Parse(dates[0]);
+                    if(year== 2018)
+                    {
+                        results.AddRange(SearchOPD(2018, author));
+                        results.AddRange(SearchOPD(2017, author));
+                        results.AddRange(SearchOPD(2016, author));
+                        results.AddRange(SearchOPD(2015, author));
+                        AnalyzeOPDList(results, author);
+                    }
+                    else if(year == 2017)
+                    {
+                        results.AddRange(SearchOPD(2017, author));
+                        results.AddRange(SearchOPD(2016, author));
+                        results.AddRange(SearchOPD(2015, author));
+                        results.AddRange(SearchOPD(2014, author));
+                    }
+                    else if(year == 2016)
+                    {
+                        results.AddRange(SearchOPD(2016, author));
+                        results.AddRange(SearchOPD(2015, author));
+                        results.AddRange(SearchOPD(2014, author));
+                        results.AddRange(SearchOPD(2013, author));
+                    }
+                    else if (year == 2015)
+                    {
+                        results.AddRange(SearchOPD(2015, author));
+                        results.AddRange(SearchOPD(2014, author));
+                        results.AddRange(SearchOPD(2013, author));
+                    }
+                    else if (year == 2014)
+                    {
+                        results.AddRange(SearchOPD(2014, author));
+                        results.AddRange(SearchOPD(2013, author));
+                    }
+                    else if(year == 2013)
+                    {
+                        results.AddRange(SearchOPD(2013, author));
+                    }
                 }
                 catch(Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
+                AnalyzeOPDList(results, author);
             }
+        }
+
+        private static IList<String[]> SearchOPD(int year, Person author)
+        {
+            List<String[]> results = (List<String[]>)GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                     @$"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_GNRL_PGYR{year}_P01172020.csv");
+            results.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_OWNRSHP_PGYR{year}_P01172020.csv"));
+            results.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
+            return results;
         }
 
         //Next step to perform: Analyze the list acquired from the OPD and then compare if all of the companies listed in the OPD match with the companies that they listed.
