@@ -44,11 +44,22 @@ namespace RedcapApiDemo
                     {
                         //Thread Thread2018 = new Thread(() => SearchOPD(2018, author));
                         //Thread2018.Start();
-                        results.AddRange(SearchOPD(2018, author));
-                        results.AddRange(SearchOPD(2017, author));
-                        results.AddRange(SearchOPD(2016, author));
-                        results.AddRange(SearchOPD(2015, author));
-
+                        //results.AddRange(SearchOPD(2018, author));
+                        //results.AddRange(SearchOPD(2017, author));
+                        //results.AddRange(SearchOPD(2016, author));
+                        //results.AddRange(SearchOPD(2015, author));
+                        Thread Thread2018 = new Thread(()=>VoidSearchOPD(2018, author));
+                        Thread Thread2017 = new Thread(()=>VoidSearchOPD(2017, author));
+                        Thread Thread2016 = new Thread(() => VoidSearchOPD(2016, author));
+                        Thread Thread2015 = new Thread(() => VoidSearchOPD(2015, author));
+                        Thread2018.Start();
+                        Thread2017.Start();
+                        Thread2016.Start();
+                        Thread2015.Start();
+                        Thread2018.Join();
+                        Thread2017.Join();
+                        Thread2016.Join();
+                        Thread2015.Join();
                     }
                     else if(year == 2017)
                     {
@@ -86,6 +97,17 @@ namespace RedcapApiDemo
                 }
                 AnalyzeOPDList(results, author);
             }
+        }
+
+        private static void VoidSearchOPD(int year, Person author)
+        {
+            searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                     @$"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_GNRL_PGYR{year}_P01172020.csv"));
+            searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_OWNRSHP_PGYR{year}_P01172020.csv"));
+            searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
+            
         }
 
         private static IList<String[]> SearchOPD(int year, Person author)
