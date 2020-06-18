@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
 using AcquireData;
 using Newtonsoft.Json;
 using Redcap;
@@ -10,6 +12,7 @@ namespace RedcapApiDemo
     class Program
     {
         static List<Person> authors;
+        static List<String[]> searchResults = new List<String[]>();
         static void Main(string[] args)
         {
             Console.WriteLine("Hello! Welcome to the OPD searcher.");
@@ -39,11 +42,13 @@ namespace RedcapApiDemo
                     int year = int.Parse(dates[0]);
                     if(year== 2018)
                     {
+                        //Thread Thread2018 = new Thread(() => SearchOPD(2018, author));
+                        //Thread2018.Start();
                         results.AddRange(SearchOPD(2018, author));
                         results.AddRange(SearchOPD(2017, author));
                         results.AddRange(SearchOPD(2016, author));
                         results.AddRange(SearchOPD(2015, author));
-                        AnalyzeOPDList(results, author);
+
                     }
                     else if(year == 2017)
                     {
