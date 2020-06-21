@@ -19,8 +19,8 @@ namespace AcquireData
         public string state { get; set; }
         private string  Involvement { get; set; }
         private string otherInvolvement { get; set; }
-        private string companiesNumbered { get; set; }
-        private string otherCompanies { get; set; }
+        public string companiesNumbered { get; set; }
+        public string otherCompanies { get; set; }
         private string articleNumber { get; set; }
         private string journal { get; set; }
         public string receiveddate { get; set; }

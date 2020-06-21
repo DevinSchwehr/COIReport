@@ -124,7 +124,10 @@ namespace RedcapApiDemo
         //Next step to perform: Analyze the list acquired from the OPD and then compare if all of the companies listed in the OPD match with the companies that they listed.
         static void AnalyzeOPDList(List<String[]> rows, Person author)
         {
-
+            //These two lines of code get us a list with all of the companies that this person has reported receiving payments from.
+            //After this, we will use the rows that we received to 
+            List<String> authorReportedCompanies = new List<String>(author.companiesNumbered.Split(','));
+            authorReportedCompanies.AddRange(author.otherCompanies.Split(','));
         }
     }
 }
