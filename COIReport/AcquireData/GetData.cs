@@ -278,19 +278,21 @@ namespace AcquireData
                 // throw new ArgumentException("Error. Did Not find anybody with the same first and last name from OPD.");
                 return matches;
             }
-            bool allSameID = true;
-            string physicianID = matches[0][5];
+            //    bool allSameID = true;
+            //   string physicianID = matches[0][5];
             //This private helper method will check if all of the ID's in the list are the same.
-            allSameID = IDChecker(physicianID, matches);
+            //   allSameID = IDChecker(physicianID, matches);
             //If all of the physicians have the same ID, then return the list.
-            if (allSameID)
-            {
-                return matches;
-            }
+            //ERROR. do not return list yet. we want to confirm the person we found is the right person.
+            //if (allSameID)
+            //{
+            //    return matches;
+            //}
             //Otherwise, get more specific
-            else
-            {
-                List<string[]> duplicateMatches = matches;
+            //   else
+            // {
+            // List<string[]> duplicateMatches = matches;
+            List<String[]> duplicateMatches = new List<string[]>(matches);
                 foreach(string[] author in duplicateMatches)
                 {
                     //If the author doesn't have the same city or state, remove them. This will ensure that only those from the same city and state will stay in the list.
@@ -298,17 +300,21 @@ namespace AcquireData
                   if(!(author[12].Equals(city) && author[13].Equals(state))) { matches.Remove(author); }
                 }
                 //Now do another check to see if everyone has the same physician id
-                physicianID = matches[0][5];
-                allSameID = IDChecker(physicianID, matches);
-                //If they all now have the same ID, then return the list
-                if (allSameID) { return matches; }
-                else
-                {
-                    //If you still cannot narrow down the list to one physician, throw an error.
-                    throw new ArgumentException("Error: Could not narrow list down to one candidate.");
-                }
 
+           // }
+           if(matches.Count == 0) { return matches; }
+
+           string physicianID = matches[0][5];
+           bool allSameID = IDChecker(physicianID, matches);
+           //If they all now have the same ID, then return the list
+           if (allSameID) { return matches; }
+            else
+            {
+                //If you still cannot narrow down the list to one physician, throw an error.
+                throw new ArgumentException("Error: Could not narrow list down to one candidate.");
             }
+
+
         }
 
         private static bool IDChecker(string ID, List<String[]> authors)

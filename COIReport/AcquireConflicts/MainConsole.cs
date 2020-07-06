@@ -127,7 +127,8 @@ namespace RedcapApiDemo
                 {
                     Console.WriteLine(e.Message);
                 }
-                AnalyzeOPDList(results, author);
+                OutputToCSV(searchResults);
+               // AnalyzeOPDList(results, author);
             }
         }
 
@@ -135,10 +136,10 @@ namespace RedcapApiDemo
         {
             searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
                      @$"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_GNRL_PGYR{year}_P01172020.csv"));
-            searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_OWNRSHP_PGYR{year}_P01172020.csv"));
-            searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
+            //searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+            //        $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_OWNRSHP_PGYR{year}_P01172020.csv"));
+            //searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
+            //        $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
             
         }
 
@@ -151,6 +152,11 @@ namespace RedcapApiDemo
             results.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
                     $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
             return results;
+        }
+
+        private static void OutputToCSV(List<String[]> searchResults)
+        {
+            string folderPath = 
         }
 
         //Next step to perform: Analyze the list acquired from the OPD and then compare if all of the companies listed in the OPD match with the companies that they listed.
@@ -169,6 +175,10 @@ namespace RedcapApiDemo
             {
                 //If there is an OPD entry that has a company that is not in the list of companies the author reported,
                 //Then there is a discrepancy that must be shown to the user.
+
+                //WARNING: try not to do a direct match. maybe try and split the name apart and compare words together. if majority of words match, then its a hit.
+                //what if the author reported a non-profit like the National Eye Institute
+                //Maybe only compare the first part of the name together.
                 if (!(authorCompanies.Contains(OPDEntry[25])))
                 {
                     Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + "Type of Payment: " + OPDEntry[34]);
@@ -177,6 +187,9 @@ namespace RedcapApiDemo
                 else
                 {
                     //We then remove that company from the list. This will help us later to print out all of the companies that the author reported that were not found in the OPD
+                    //ERROR: Cannot delete the author in the case of multiple entries from the company to the author.
+                    //FIX: do a loop one way (OPD to author) and then do another loop the other way (author to OPD) to try and find both types of discrepancies.
+                    //     this should not be a huge waste of time as the data should still be very small.
                     authorCompanies.Remove(OPDEntry[25]);
                 }
             }
