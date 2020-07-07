@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using AcquireData;
 using Newtonsoft.Json;
@@ -27,8 +28,11 @@ namespace RedcapApiDemo
                 Console.WriteLine("Error in acquiring Data. Printing error message" + e.Message);
             }
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
-            foreach(Person author in authors)
+           // foreach(Person author in authors)
+            for(int i = 0; i < 100; i++)
             {
+                Person author = authors[i];
+                Console.WriteLine("Author #" + (i+1) + ": " + author.first + " " + author.last);
                 //What I want to do in this loop.
                 //Break down the author to get parameters for FindPeopleFromOPD
                 //need to convert state from number to string using metadata.
@@ -156,7 +160,20 @@ namespace RedcapApiDemo
 
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string folderPath = 
+            string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\AuthorSearchOutput.csv";
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath).Close();
+            }
+            string delimiter = ",";
+
+            using (System.IO.TextWriter writer = File.AppendText(filePath))
+            {
+                for(int index = 0; index < searchResults.Count; index++)
+                {
+                    writer.WriteLine(string.Join(delimiter, searchResults[index]));
+                }
+            }
         }
 
         //Next step to perform: Analyze the list acquired from the OPD and then compare if all of the companies listed in the OPD match with the companies that they listed.
