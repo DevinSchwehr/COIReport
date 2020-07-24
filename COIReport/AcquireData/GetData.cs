@@ -304,15 +304,16 @@ namespace AcquireData
            // }
            if(matches.Count == 0) { return matches; }
 
-           string physicianID = matches[0][5];
-           bool allSameID = IDChecker(physicianID, matches);
-           //If they all now have the same ID, then return the list
-           if (allSameID) { return matches; }
-            else
-            {
-                //If you still cannot narrow down the list to one physician, throw an error.
-                throw new ArgumentException("Error: Could not narrow list down to one candidate.");
-            }
+            //string physicianID = matches[0][5];
+            //bool allSameID = IDChecker(physicianID, matches);
+            ////If they all now have the same ID, then return the list
+            //if (allSameID) { return matches; }
+            // else
+            // {
+            //     //If you still cannot narrow down the list to one physician, throw an error.
+            //     throw new ArgumentException("Error: Could not narrow list down to one candidate.");
+            // }
+            return matches;
 
 
         }
