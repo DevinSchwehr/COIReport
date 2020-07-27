@@ -61,14 +61,18 @@ namespace RedcapApiDemo
                         //results.AddRange(SearchOPD(2017, author));
                         //results.AddRange(SearchOPD(2016, author));
                         //results.AddRange(SearchOPD(2015, author));
-                        Thread2018.Start();
-                        Thread2017.Start();
-                        Thread2016.Start();
-                        Thread2015.Start();
-                        Thread2018.Join();
-                        Thread2017.Join();
-                        Thread2016.Join();
-                        Thread2015.Join();
+                        //Thread2018.Start();
+                        //Thread2017.Start();
+                        //Thread2016.Start();
+                        //Thread2015.Start();
+                        //Thread2018.Join();
+                        //Thread2017.Join();
+                        //Thread2016.Join();
+                        //Thread2015.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2018"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2017"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2016"));
+
                     }
                     else if(year == 2017)
                     {
@@ -76,14 +80,18 @@ namespace RedcapApiDemo
                         //results.AddRange(SearchOPD(2016, author));
                         //results.AddRange(SearchOPD(2015, author));
                         //results.AddRange(SearchOPD(2014, author));
-                        Thread2017.Start();
-                        Thread2016.Start();
-                        Thread2015.Start();
-                        Thread2014.Start();
-                        Thread2017.Join();
-                        Thread2016.Join();
-                        Thread2015.Join();
-                        Thread2014.Join();
+                        //Thread2017.Start();
+                        //Thread2016.Start();
+                        //Thread2015.Start();
+                        //Thread2014.Start();
+                        //Thread2017.Join();
+                        //Thread2016.Join();
+                        //Thread2015.Join();
+                        //Thread2014.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2017"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2016"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2015"));
+
                     }
                     else if(year == 2016)
                     {
@@ -91,14 +99,17 @@ namespace RedcapApiDemo
                         //results.AddRange(SearchOPD(2015, author));
                         //results.AddRange(SearchOPD(2014, author));
                         //results.AddRange(SearchOPD(2013, author));
-                        Thread2016.Start();
-                        Thread2015.Start();
-                        Thread2014.Start();
-                        Thread2013.Start();
-                        Thread2016.Join();
-                        Thread2015.Join();
-                        Thread2014.Join();
-                        Thread2013.Join();
+                        //Thread2016.Start();
+                        //Thread2015.Start();
+                        //Thread2014.Start();
+                        //Thread2013.Start();
+                        //Thread2016.Join();
+                        //Thread2015.Join();
+                        //Thread2014.Join();
+                        //Thread2013.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2016"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2015"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2014"));
 
                     }
                     else if (year == 2015)
@@ -106,28 +117,35 @@ namespace RedcapApiDemo
                         //results.AddRange(SearchOPD(2015, author));
                         //results.AddRange(SearchOPD(2014, author));
                         //results.AddRange(SearchOPD(2013, author));
-                        Thread2015.Start();
-                        Thread2014.Start();
-                        Thread2013.Start();
-                        Thread2015.Join();
-                        Thread2014.Join();
-                        Thread2013.Join();
+                        //Thread2015.Start();
+                        //Thread2014.Start();
+                        //Thread2013.Start();
+                        //Thread2015.Join();
+                        //Thread2014.Join();
+                        //Thread2013.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2015"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2014"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2013"));
+
                     }
                     else if (year == 2014)
                     {
                         //results.AddRange(SearchOPD(2014, author));
                         //results.AddRange(SearchOPD(2013, author));
-                        Thread2014.Start();
-                        Thread2013.Start();
-                        Thread2014.Join();
-                        Thread2013.Join();
+                        //Thread2014.Start();
+                        //Thread2013.Start();
+                        //Thread2014.Join();
+                        //Thread2013.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2014"));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2013"));
 
                     }
                     else if(year == 2013)
                     {
                         //results.AddRange(SearchOPD(2013, author));
-                        Thread2013.Start();
-                        Thread2013.Join();
+                        //Thread2013.Start();
+                        //Thread2013.Join();
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, author.state, "OPD_GNRL_2013"));
                     }
                 }
                 catch(Exception e)
