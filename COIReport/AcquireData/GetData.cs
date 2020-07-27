@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Redcap;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 
 namespace AcquireData
@@ -16,11 +17,13 @@ namespace AcquireData
         private static string apiURL;
         private static string RedCapResult;
         private static string MetaDataResult;
+        public static readonly string connectionString;
         private static Dictionary<int, Person> authorshipDictionary;
         public static Dictionary<int, string> clinicalDegrees;
         public static Dictionary<int, string> stateDictionary;
         public static Dictionary<int ,string> companyDictionary;
         public static Dictionary<int, string> typeDictionary;
+
 
         /// <summary>
         /// The purpose of this method is to acquire the JSON file from RedCap using the RedCap API
@@ -237,6 +240,24 @@ namespace AcquireData
     /// </summary>
     public static class GetOpdData
     {
+        public static readonly string connectionString;
+        static GetOpdData()
+        {
+            var builder = new ConfigurationBuilder();
+
+            builder.AddUserSecrets<GetData>();
+            IConfigurationRoot Configuration = builder.Build();
+            var SelectedSecrets = Configuration.GetSection("Lab14Secrets");
+
+            connectionString = new SqlConnectionStringBuilder()
+            {
+                DataSource = "cs3500.eng.utah.edu",
+                InitialCatalog = "cs3500",
+                UserID = SelectedSecrets["SQLUsername"],
+                Password = SelectedSecrets["SQLPassword"]
+            }.ConnectionString;
+
+        }
         /// <summary>
         /// This method right now is pretty barebones. As of now it just looks through the one OPD file I have, and just starts pulling names
         /// and putting it into a string array. This is just the base, in the future I'll be implementing search restrictions
@@ -316,6 +337,79 @@ namespace AcquireData
             return matches;
 
 
+        }
+
+        /// <summary>
+        /// The purpose of this method is to get correct authors from the OPD using the SQL Database. This should be faster than 
+        /// the current way of searching for the author.
+        /// 
+        /// Things to know for parsing (Post 2016)
+        /// 5 = Physician ID
+        /// 6 = First Name
+        /// 7 = Middle Name
+        /// 8 = Last Name
+        /// 12 = Recipient City
+        /// 13 = Recipient State
+
+        /// </summary>
+        /// <param name="first">the author's first name</param>
+        /// <param name="last">the author's last name</param>
+        /// <param name="middle">the author's middle name</param>
+        /// <param name="city">the author's city</param>
+        /// <param name="state">the author's state</param>
+        /// <returns>a list of all the author's with the same first name, last name, and either the same city and state or the same state if an author in the same city cannot be found</returns>
+        public static IList<String[]> FindPeopleFromOPDSQL(string first, string last, string city, string state,string table)
+        {
+            List<String[]> OPDOutputs = new List<String[]>();
+            //The following try block is the process of querying the database to get the authors.
+            try
+            {
+                using(SqlConnection con = new SqlConnection(connectionString))
+                {
+                    con.Open();
+                    //This command will query the database for any author with the same first and last name
+                    using( SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) like upper('%{first}%') and upper(Physician_Last_Name) like upper('%{last}%')", con))
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            String[] fields = new string[reader.FieldCount];
+                            for(int i =0; i< fields.Length; i++)
+                            {
+                                //due to the nature of the Table, all entries have leading and ending quotes. These couple of lines are to remove those quotes.
+                                string currentField = reader[i].ToString();
+                                currentField = currentField.Replace("\"", "");
+                                fields[i] = currentField;
+                            }
+                            OPDOutputs.Add(fields);
+                        }
+                    }
+                }
+            }
+            catch(SqlException exception)
+            {
+                Console.WriteLine($"Error in SQL Connection: {exception.Message}");
+            }
+            List<String[]> sameCityState = new List<String[]>();
+            List<String[]> sameState = new List<String[]>();
+            //We are now making two separate checks for if any of the authors have the same city and state and at the same time checking for 
+            //any authors that are just in the same state.
+            foreach(string[] row in OPDOutputs)
+            {
+                if(row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
+                if(row[13].Equals(state)) { sameState.Add(row); }
+            }
+            //If there are people who have the same city and state, return that.
+            if(sameCityState.Count != 0) { return sameCityState; }
+            //If there are none in the same city and state, return those in the same state.
+            else if(sameState.Count != 0) { return sameState; }
+            //Finally, if there are none in both, we return an empty list. returning sameCityState for simplicity
+            //We also report an error to the console saying that we could not find the author.
+            else
+            {
+                Console.WriteLine($"Error: No author found for {first}, {last} - {city}, {state}");
+                return sameCityState;
+            }
         }
 
         private static bool IDChecker(string ID, List<String[]> authors)

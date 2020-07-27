@@ -29,7 +29,7 @@ namespace RedcapApiDemo
             }
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
            // foreach(Person author in authors)
-            for(int i = 43; i < 100; i++)
+            for(int i = 0; i < 100; i++)
             {
                 //This is just for the test. Do not let this stay in!!
                 searchResults = new List<String[]>();
