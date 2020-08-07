@@ -247,12 +247,12 @@ namespace AcquireData
 
             builder.AddUserSecrets<GetData>();
             IConfigurationRoot Configuration = builder.Build();
-            var SelectedSecrets = Configuration.GetSection("Lab14Secrets");
+            var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
 
             connectionString = new SqlConnectionStringBuilder()
             {
-                DataSource = "cs3500.eng.utah.edu",
-                InitialCatalog = "cs3500",
+                DataSource = "cs3500.eng.utah.edu, 14330",
+                InitialCatalog = SelectedSecrets["DataBaseName"],
                 UserID = SelectedSecrets["SQLUsername"],
                 Password = SelectedSecrets["SQLPassword"]
             }.ConnectionString;
@@ -368,23 +368,26 @@ namespace AcquireData
                 {
                     con.Open();
                     //This command will query the database for any author with the same first and last name
-                    using( SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) like upper('%{first}%') and upper(Physician_Last_Name) like upper('%{last}%')", con))
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('\"{first}\"') and upper(Physician_Last_Name) = upper('\"{last}\"')", con))
                     {
-                        while (reader.Read())
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            String[] fields = new string[reader.FieldCount];
-                            for(int i =0; i< fields.Length; i++)
+                            while (reader.Read())
                             {
-                                //due to the nature of the Table, all entries have leading and ending quotes. These couple of lines are to remove those quotes.
-                                string currentField = reader[i].ToString();
-                                currentField = currentField.Replace("\"", "");
-                                fields[i] = currentField;
+                                String[] fields = new string[reader.FieldCount];
+                                for (int i = 0; i < fields.Length; i++)
+                                {
+                                    //due to the nature of the Table, all entries have leading and ending quotes. These couple of lines are to remove those quotes.
+                                    string currentField = reader[i].ToString();
+                                    currentField = currentField.Replace("\"", "");
+                                    fields[i] = currentField;
+                                }
+                                OPDOutputs.Add(fields);
                             }
-                            OPDOutputs.Add(fields);
                         }
                     }
                 }
+                
             }
             catch(SqlException exception)
             {
@@ -397,19 +400,16 @@ namespace AcquireData
             foreach(string[] row in OPDOutputs)
             {
                 if(row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
-                if(row[13].Equals(state)) { sameState.Add(row); }
+                //commenting out the rows for just the same state, as that is no longer the direction we want the program to go.
+               // if(row[13].Equals(state)) { sameState.Add(row); }
             }
             //If there are people who have the same city and state, return that.
-            if(sameCityState.Count != 0) { return sameCityState; }
+            //if(sameCityState.Count != 0) { return sameCityState; }
             //If there are none in the same city and state, return those in the same state.
-            else if(sameState.Count != 0) { return sameState; }
+           // else if(sameState.Count != 0) { return sameState; }
             //Finally, if there are none in both, we return an empty list. returning sameCityState for simplicity
             //We also report an error to the console saying that we could not find the author.
-            else
-            {
-                Console.WriteLine($"Error: No author found for {first}, {last} - {city}, {state}");
                 return sameCityState;
-            }
         }
 
         private static bool IDChecker(string ID, List<String[]> authors)
