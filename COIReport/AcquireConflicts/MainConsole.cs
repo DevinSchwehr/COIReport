@@ -29,7 +29,7 @@ namespace RedcapApiDemo
             }
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             // foreach(Person author in authors)
-            for (int i = 0; i < 100; i++)
+            for (int i = 4; i < 100; i++)
             {
                 //This is just for the test. Do not let this stay in!!
                 searchResults = new List<String[]>();
@@ -215,7 +215,7 @@ namespace RedcapApiDemo
             {
                 for (int i = 0; i < authorNumberedCompanies.Length; i++)
                 {
-                    authorCompanies.Add(GetData.companyDictionary[int.Parse(authorNumberedCompanies[i])]);
+                    authorCompanies.Add(GetData.companyDictionary[int.Parse(authorNumberedCompanies[i])].Trim());
                 }
             }
             //Now we begin to analyze the reported companies with the name matches from the OPD
