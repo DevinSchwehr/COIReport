@@ -206,6 +206,9 @@ namespace RedcapApiDemo
         {
             List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
             string[] authorNumberedCompanies = author.companiesNumbered.Split(',');
+            //This list is to do a reverse comparison from author reported companies to the OPD to see if any companies did not 
+            //Report a payment where the author did
+            HashSet<String> companyHits = new HashSet<string>();
             //Since everything is in numbers, we go through a loop of converting the numbers into companies from the data dictionaries
             //and then we add them to the list of all of the companies the author reported.
             if (!(authorNumberedCompanies[0].Equals("")))
@@ -238,15 +241,32 @@ namespace RedcapApiDemo
                     //     this should not be a huge waste of time as the data should still be very small.
                     //OTHER METHOD: create a list of companies that are a 'hit' and then against the author list to see any companies that are not a hit and report those
                     //              companies as discrepancies.
-                    authorCompanies.Remove(OPDEntry[25]);
+                    companyHits.Add(OPDEntry[25]);
                 }
             }
-            //After the loop, we check the remaining companies reported by the author. If there are any, we report to the user that these companies were not found in the OPD.
-            if (authorCompanies.Count > 0)
+            //After the loop, we check to see if there are any companies that were reported by the author, but not reported by the 
+            if(companyHits.Count > 0)
             {
-                foreach (string company in authorCompanies)
+                //The method here is to go through the set and remove any hits from the authorCompany list.
+                //After that, if the redcap list is not empty, then there are discrepancies.
+                foreach(string company in companyHits)
                 {
-                    Console.WriteLine("DISCREPANCY: Company " + company + " was reported by the author, but not found within the OPD.");
+                    if(findCompany(company, authorCompanies))
+                    {
+                        authorCompanies.Remove(company);
+                    }
+                }
+                //after the string, we check to see if there are any companies left that aren't 'other'
+                if(authorCompanies.Count > 0)
+                {
+                    //If there are more companies, report them as discrepancies
+                    foreach(string remainingCompany in authorCompanies)
+                    {
+                        if (!(remainingCompany.Equals("other")))
+                        {
+                            Console.WriteLine($"DISCREPANCY: Company {remainingCompany} was reported by author but not found within the OPD.");
+                        }
+                    }
                 }
             }
         }
