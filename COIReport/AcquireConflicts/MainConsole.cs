@@ -14,6 +14,7 @@ namespace RedcapApiDemo
     {
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
+        static string companyHitString; 
         static void Main(string[] args)
         {
             Console.WriteLine("Hello! Welcome to the OPD searcher.");
@@ -230,7 +231,7 @@ namespace RedcapApiDemo
               //  if (!(authorCompanies.Contains(OPDEntry[25])))
                 if(!(findCompany(OPDEntry[25], authorCompanies)))
                 {
-                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + "Type of Payment: " + OPDEntry[34]);
+                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34]);
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
@@ -241,31 +242,54 @@ namespace RedcapApiDemo
                     //     this should not be a huge waste of time as the data should still be very small.
                     //OTHER METHOD: create a list of companies that are a 'hit' and then against the author list to see any companies that are not a hit and report those
                     //              companies as discrepancies.
-                    companyHits.Add(OPDEntry[25]);
+                    companyHits.Add(companyHitString);
                 }
             }
             //After the loop, we check to see if there are any companies that were reported by the author, but not reported by the 
-            if(companyHits.Count > 0)
+            //if(companyHits.Count > 0)
+            //{
+            //    //The method here is to go through the set and remove any hits from the authorCompany list.
+            //    //After that, if the redcap list is not empty, then there are discrepancies.
+            //    foreach(string company in companyHits)
+            //    {
+            //        if(findCompany(company, authorCompanies))
+            //        {
+            //            authorCompanies.Remove(company);
+            //        }
+            //    }
+            //    //after the string, we check to see if there are any companies left that aren't 'other'
+            //    if(authorCompanies.Count > 0)
+            //    {
+            //        //If there are more companies, report them as discrepancies
+            //        foreach(string remainingCompany in authorCompanies)
+            //        {
+            //            if (!(remainingCompany.Equals("other")))
+            //            {
+            //                Console.WriteLine($"DISCREPANCY: Company {remainingCompany} was reported by author but not found within the OPD.");
+            //            }
+            //        }
+            //    }
+            //}
+            //This if statement is to catch if there were not 'hits', but the author still had companies reported.
+            if(companyHits.Count == 0 && !(authorCompanies[0].Equals("")))
             {
-                //The method here is to go through the set and remove any hits from the authorCompany list.
-                //After that, if the redcap list is not empty, then there are discrepancies.
-                foreach(string company in companyHits)
+                foreach(string company in authorCompanies)
                 {
-                    if(findCompany(company, authorCompanies))
-                    {
-                        authorCompanies.Remove(company);
-                    }
+                    Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
                 }
-                //after the string, we check to see if there are any companies left that aren't 'other'
+            }
+            //This else statement is for finding the remaining companies that were hits
+            else
+            {
+                foreach(string hit in companyHits)
+                {
+                    authorCompanies.Remove(hit);
+                }
                 if(authorCompanies.Count > 0)
                 {
-                    //If there are more companies, report them as discrepancies
-                    foreach(string remainingCompany in authorCompanies)
+                    foreach(string company in authorCompanies)
                     {
-                        if (!(remainingCompany.Equals("other")))
-                        {
-                            Console.WriteLine($"DISCREPANCY: Company {remainingCompany} was reported by author but not found within the OPD.");
-                        }
+                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
                     }
                 }
             }
@@ -284,10 +308,23 @@ namespace RedcapApiDemo
         {
             foreach(string company in RedCapCompanies)
             {
-                if (!(company.Equals("")))
+                //if (!(company.Equals("")))
+                //{
+                //    string[] rowEntrySplit = rowCompanyEntry.Split(' ');
+                //    if(rowEntrySplit[0].ToUpper().Equals("the".ToUpper()))
+                //    {
+                //      if (RedCapCompanies.Contains(rowEntrySplit[1])) { return true; }
+
+                //    }
+                //    else if (RedCapCompanies.Contains(rowEntrySplit[0])) { return true; }  
+                //}
+
+                //Revamping the method! I'm flipping it now to see if the Redcap company (which is smaller, one word) is found within the larger
+                //OPD Company name. This should make it simpler to check. 
+                if(rowCompanyEntry.ToUpper().Contains(company.ToUpper())) 
                 {
-                    string[] rowEntrySplit = rowCompanyEntry.Split(' ');
-                    if(RedCapCompanies.Contains(rowEntrySplit[0])) { return true; }  
+                    companyHitString = company;
+                    return true; 
                 }
             }
             return false;

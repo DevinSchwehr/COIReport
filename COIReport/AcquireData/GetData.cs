@@ -157,7 +157,7 @@ namespace AcquireData
             foreach(string pair in companies)
             {
                 string[] splitPair = pair.Split(',');
-                companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+                companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]));
             }
 
         }
