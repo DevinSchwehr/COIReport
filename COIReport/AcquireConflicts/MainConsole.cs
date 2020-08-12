@@ -231,7 +231,7 @@ namespace RedcapApiDemo
               //  if (!(authorCompanies.Contains(OPDEntry[25])))
                 if(!(findCompany(OPDEntry[25], authorCompanies)))
                 {
-                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34]);
+                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + " " + GetOpdData.FindAuthorPosition(author.first, author.last)); ;
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
@@ -295,6 +295,7 @@ namespace RedcapApiDemo
             }
         }
 
+
         /// <summary>
         /// The purpose of this method is to try and match the correct companies from the RedCap entry to the entry from the OPD row. 
         /// I will be looking for keywords in the terms of the example below: 
@@ -304,7 +305,7 @@ namespace RedcapApiDemo
         /// <param name="rowCompanyEntry"></param>
         /// <param name="RedCapCompanies"></param>
         /// <returns></returns>
-        static bool findCompany(string rowCompanyEntry, List<String> RedCapCompanies)
+        private static bool findCompany(string rowCompanyEntry, List<String> RedCapCompanies)
         {
             foreach(string company in RedCapCompanies)
             {

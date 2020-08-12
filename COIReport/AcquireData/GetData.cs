@@ -157,7 +157,7 @@ namespace AcquireData
             foreach(string pair in companies)
             {
                 string[] splitPair = pair.Split(',');
-                companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]));
+                companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
             }
 
         }
@@ -338,7 +338,6 @@ namespace AcquireData
 
 
         }
-
         /// <summary>
         /// The purpose of this method is to get correct authors from the OPD using the SQL Database. This should be faster than 
         /// the current way of searching for the author.
@@ -424,5 +423,36 @@ namespace AcquireData
             return true;
 
         }
+
+        public static string FindAuthorPosition(string first, string last)
+        {
+            string position = "";
+            try
+            {
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
+                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            position = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            }
+            catch(SqlException e)
+            {
+                Console.WriteLine($"Error in SQL Connection: {e.Message}");
+            }
+            if(position.Equals("f")) { return "first"; }
+            else if(position.Equals("m")) { return "middle"; }
+            else if (position.Equals("l")) { return "last"; }
+            else { return "Position not found"; }
+        }
+
     }
 }
