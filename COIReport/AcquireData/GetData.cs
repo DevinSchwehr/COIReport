@@ -438,7 +438,7 @@ namespace AcquireData
                     {
                         while (reader.Read())
                         {
-                            position = reader.GetString(0);
+                            position = reader.GetString(0); //
                         }
                     }
                 }
