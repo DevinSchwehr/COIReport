@@ -357,9 +357,12 @@ namespace AcquireData
         /// <param name="city">the author's city</param>
         /// <param name="state">the author's state</param>
         /// <returns>a list of all the author's with the same first name, last name, and either the same city and state or the same state if an author in the same city cannot be found</returns>
-        public static IList<String[]> FindPeopleFromOPDSQL(string first, string last, string city, string state,string table)
+        public static IList<String[]> FindPeopleFromOPDSQL(string first, string last, string city, string state,string table, string receiveDate)
         {
+            DateTime RedcapDate = DateTime.Parse(receiveDate);
             List<String[]> OPDOutputs = new List<String[]>();
+            List<String[]> sameCityState = new List<String[]>();
+            List<String[]> matchingID = new List<String[]>();
             //The following try block is the process of querying the database to get the authors.
             try
             {
@@ -367,7 +370,7 @@ namespace AcquireData
                 {
                     con.Open();
                     //This command will query the database for any author with the same first and last name
-                    using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('\"{first}\"') and upper(Physician_Last_Name) = upper('\"{last}\"')", con))
+                    using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
@@ -377,38 +380,74 @@ namespace AcquireData
                                 for (int i = 0; i < fields.Length; i++)
                                 {
                                     //due to the nature of the Table, all entries have leading and ending quotes. These couple of lines are to remove those quotes.
-                                    string currentField = reader[i].ToString();
-                                    currentField = currentField.Replace("\"", "");
-                                    fields[i] = currentField;
+                                    //string currentField = reader[i].ToString();
+                                    //currentField = currentField.Replace("\"", "");
+                                    fields[i] = reader[i].ToString();
                                 }
+                                //Before we add this to the output, we must check that it is within the proper timeframe.
+                                DateTime OpdDate = DateTime.Parse(fields[fields.Length - 1]);
+                                if(WithinTimeFrame(RedcapDate,OpdDate))
+                                {
+
                                 OPDOutputs.Add(fields);
+                                }
+                            }
+                        }
+                    }
+                    foreach (string[] row in OPDOutputs)
+                    {
+                        if (row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
+                    }
+                    //Now that we can ascertain the accuracy of the author down to what we hope is one person, we will then make another 
+                    //Search using the Physician ID of the author
+                    if(sameCityState.Count > 0)
+                    {
+                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'"))
+                        {
+                            using(SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    String[] fields = new string[reader.FieldCount];
+                                    for(int i =0; i < fields.Length; i++)
+                                    {
+                                        fields[i] = reader[i].ToString();
+                                    }
+                                    matchingID.Add(fields);
+                                }
                             }
                         }
                     }
                 }
-                
+
             }
             catch(SqlException exception)
             {
                 Console.WriteLine($"Error in SQL Connection: {exception.Message}");
             }
-            List<String[]> sameCityState = new List<String[]>();
-            List<String[]> sameState = new List<String[]>();
-            //We are now making two separate checks for if any of the authors have the same city and state and at the same time checking for 
-            //any authors that are just in the same state.
-            foreach(string[] row in OPDOutputs)
+            //We return matching ID here regardless of if there is anything in it. As it is empty, so is SameCityState.
+            return matchingID;
+        }
+
+        private static bool WithinTimeFrame(DateTime RedcapDate, DateTime opdDate)
+        {
+            //First, we must check if the OPD date is newer than the Redcap date, if it is, throw it out. 
+            if(DateTime.Compare(opdDate, RedcapDate) > 0 )
             {
-                if(row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
-                //commenting out the rows for just the same state, as that is no longer the direction we want the program to go.
-               // if(row[13].Equals(state)) { sameState.Add(row); }
+                //If this is true, then the date is later, so we throw it out.
+                return false;
             }
-            //If there are people who have the same city and state, return that.
-            //if(sameCityState.Count != 0) { return sameCityState; }
-            //If there are none in the same city and state, return those in the same state.
-           // else if(sameState.Count != 0) { return sameState; }
-            //Finally, if there are none in both, we return an empty list. returning sameCityState for simplicity
-            //We also report an error to the console saying that we could not find the author.
-                return sameCityState;
+            //Now we must make the check to see if the entry is too old to be accepted. If it is, toss it. 
+            else if(RedcapDate.Year - opdDate.Year ==2 )
+            {
+                // If the OPD month is smaller than the Redcap month, then it is outside of the period and should be tossed.
+                if(opdDate.Month.CompareTo(RedcapDate) < 0)
+                {
+                    return false; 
+                }
+            }
+            //If it hasn't returned false, then it is in the period. return true. 
+            return true;
         }
 
         private static bool IDChecker(string ID, List<String[]> authors)
