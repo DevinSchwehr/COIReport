@@ -157,9 +157,20 @@ namespace AcquireData
             foreach(string pair in companies)
             {
                 string[] splitPair = pair.Split(',');
+                splitPair[1] = TypoCheck(splitPair[1]);
                 companyDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
             }
 
+        }
+
+        private static string TypoCheck(string company)
+        {
+            if(company.Equals("Cambrium")) { return "Cambium"; }
+            if(company.Equals("Nidex")) { return "Nidek"; }
+            if(company.Equals("Aldevra")) { return "Aldeyra"; }
+            if(company.Equals("ophthea")) { return "opthea"; }
+            if(company.Equals("Abbot")) { return "Abbott";   }
+            return company;
         }
 
         /// <summary>
@@ -366,7 +377,7 @@ namespace AcquireData
             //The following try block is the process of querying the database to get the authors.
             try
             {
-                using(SqlConnection con = new SqlConnection(connectionString))
+                using (SqlConnection con = new SqlConnection(connectionString))
                 {
                     con.Open();
                     //This command will query the database for any author with the same first and last name
@@ -384,42 +395,43 @@ namespace AcquireData
                                     //currentField = currentField.Replace("\"", "");
                                     fields[i] = reader[i].ToString();
                                 }
-                                //Before we add this to the output, we must check that it is within the proper timeframe.
-                                DateTime OpdDate = DateTime.Parse(fields[fields.Length - 1]);
-                                if(WithinTimeFrame(RedcapDate,OpdDate))
-                                {
-
+                                //We don't check the timeframe here because it will get sorted later.
                                 OPDOutputs.Add(fields);
-                                }
                             }
                         }
                     }
+
                     foreach (string[] row in OPDOutputs)
                     {
                         if (row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
                     }
                     //Now that we can ascertain the accuracy of the author down to what we hope is one person, we will then make another 
                     //Search using the Physician ID of the author
-                    if(sameCityState.Count > 0)
+                    if (sameCityState.Count > 0)
                     {
-                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'"))
+                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
                         {
-                            using(SqlDataReader reader = command.ExecuteReader())
+                            using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
                                     String[] fields = new string[reader.FieldCount];
-                                    for(int i =0; i < fields.Length; i++)
+                                    for (int i = 0; i < fields.Length; i++)
                                     {
                                         fields[i] = reader[i].ToString();
                                     }
-                                    matchingID.Add(fields);
+                                    //Now we check to make sure the date is within the current timeframe.
+                                    DateTime OpdDate = DateTime.Parse(fields[31]);
+                                    if (WithinTimeFrame(RedcapDate, OpdDate))
+                                    {
+                                        matchingID.Add(fields);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
+                }
             }
             catch(SqlException exception)
             {
