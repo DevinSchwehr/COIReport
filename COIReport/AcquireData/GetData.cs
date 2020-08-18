@@ -400,7 +400,7 @@ namespace AcquireData
                             }
                         }
                     }
-
+                    con.Close();
                     foreach (string[] row in OPDOutputs)
                     {
                         if (row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
@@ -409,6 +409,7 @@ namespace AcquireData
                     //Search using the Physician ID of the author
                     if (sameCityState.Count > 0)
                     {
+                        con.Open();
                         using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
                         {
                             using (SqlDataReader reader = command.ExecuteReader())
@@ -429,6 +430,7 @@ namespace AcquireData
                                 }
                             }
                         }
+                        con.Close();
                     }
 
                 }
@@ -453,7 +455,7 @@ namespace AcquireData
             else if(RedcapDate.Year - opdDate.Year ==2 )
             {
                 // If the OPD month is smaller than the Redcap month, then it is outside of the period and should be tossed.
-                if(opdDate.Month.CompareTo(RedcapDate) < 0)
+                if(opdDate.Month.CompareTo(RedcapDate.Month) < 0)
                 {
                     return false; 
                 }
@@ -499,9 +501,9 @@ namespace AcquireData
             {
                 Console.WriteLine($"Error in SQL Connection: {e.Message}");
             }
-            if(position.Equals("f")) { return "first"; }
-            else if(position.Equals("m")) { return "middle"; }
-            else if (position.Equals("l")) { return "last"; }
+            if(position.Equals("f")) { return "Position: First"; }
+            else if(position.Equals("m")) { return "Position: Middle"; }
+            else if (position.Equals("l")) { return "Position: Last"; }
             else { return "Position not found"; }
         }
 

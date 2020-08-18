@@ -101,7 +101,8 @@ namespace AcquireData
             Involvement = BlankCheck(Involvement, newAuthor.Involvement);
             otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
             companiesNumbered = BlankCheck(companiesNumbered, newAuthor.companiesNumbered);
-            otherCompanies = BlankCheck(otherCompanies, newAuthor.otherCompanies);
+            //  otherCompanies = BlankCheck(otherCompanies, newAuthor.otherCompanies);
+            otherCompanies = OtherCompanyCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
             receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);
@@ -129,6 +130,20 @@ namespace AcquireData
                 return newVariable;
             }
             return currentVariable;
+        }
+
+        private string OtherCompanyCheck(string currentList, string newCompany)
+        {
+            if (currentList.Contains(newCompany))
+            {
+                return currentList;
+            }
+            else
+            {
+                if (currentList.Equals("")) { return newCompany; }
+                currentList += $",{newCompany}";
+                return currentList;
+            }
         }
     }
 }

@@ -29,15 +29,15 @@ namespace RedcapApiDemo
                 Console.WriteLine("Error in acquiring Data. Printing error message" + e.Message);
             }
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
-            foreach(Person author in authors)
-            //for (int i = 4; i < 100; i++)
+            //foreach(Person author in authors)
+            for (int i = 5; i < 6; i++)
             {
                 //This is just for the test. Do not let this stay in!!
                 searchResults = new List<String[]>();
 
-                //Person author = authors[i];
-                // Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
-                Console.WriteLine(author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
+                Person author = authors[i];
+                 Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
+                //Console.WriteLine(author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
 
                 //What I want to do in this loop.
                 //Break down the author to get parameters for FindPeopleFromOPD
@@ -233,7 +233,7 @@ namespace RedcapApiDemo
               //  if (!(authorCompanies.Contains(OPDEntry[25])))
                 if(!(findCompany(OPDEntry[25], authorCompanies)))
                 {
-                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + " " + GetOpdData.FindAuthorPosition(author.first, author.last)); ;
+                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
@@ -281,7 +281,7 @@ namespace RedcapApiDemo
                 }
             }
             //This else statement is for finding the remaining companies that were hits
-            else
+            else if(companyHits.Count != 0)
             {
                 foreach(string hit in companyHits)
                 {
@@ -291,7 +291,10 @@ namespace RedcapApiDemo
                 {
                     foreach(string company in authorCompanies)
                     {
+                        if (!company.Equals("Other"))
+                        {
                         Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
+                        }
                     }
                 }
             }
