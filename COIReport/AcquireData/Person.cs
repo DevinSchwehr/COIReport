@@ -88,7 +88,6 @@ namespace AcquireData
         /// <returns></returns>
         internal Person CheckAndMerge(Person newAuthor)
         {
-            //if(first.Equals("") && !newAuthor.first.Equals("")) { first = newAuthor.first; }
             first = BlankCheck(first, newAuthor.first);
             middle = BlankCheck(middle, newAuthor.middle);
             last = BlankCheck(last, newAuthor.last);
@@ -101,7 +100,6 @@ namespace AcquireData
             Involvement = BlankCheck(Involvement, newAuthor.Involvement);
             otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
             companiesNumbered = BlankCheck(companiesNumbered, newAuthor.companiesNumbered);
-            //  otherCompanies = BlankCheck(otherCompanies, newAuthor.otherCompanies);
             otherCompanies = OtherCompanyCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
@@ -132,6 +130,14 @@ namespace AcquireData
             return currentVariable;
         }
 
+        /// <summary>
+        /// This is used for getting all of the 'other' companies. We don't use BlankCheck here
+        /// because there can be multiple companies, all on their own individual row. So we add them
+        /// to the string as we find them instead of doing a BlankCheck.
+        /// </summary>
+        /// <param name="currentList">the current list of other companies</param>
+        /// <param name="newCompany">the company that is being checked to be added in or not</param>
+        /// <returns>the string either with the new company added, or the string as it was.</returns>
         private string OtherCompanyCheck(string currentList, string newCompany)
         {
             if (currentList.Contains(newCompany))

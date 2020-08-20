@@ -10,6 +10,10 @@ using System.IO;
 
 namespace AcquireData
 {
+    /// <summary>
+    /// The purpose of this class is to acquire data from redcap. This includes the report you are seeking, 
+    /// as well as the metadata. There is another class within this file that is for getting the OPD Data.
+    /// </summary>
     public class GetData
     {
         private static String token;
@@ -46,53 +50,49 @@ namespace AcquireData
             //This is all of the RedCapData, including the data dictionary!
             RedCapResult = redcap_api.ExportReportsAsync(token, int.Parse(reportID), Redcap.Models.ReturnFormat.json).Result;
             MetaDataResult = redcap_api.ExportMetaDataAsync(token, Redcap.Models.ReturnFormat.csv, metadataFields).Result;
-
-
-            //Current problems with receiving data. JSON breaks every line down as an object when it's not supposed to. Because of this,
-            //I would have to go into each 'person' created and find what chunk of an actual Person it contains.
-
         }
 
         /// <summary>
-        /// The purpose of this method is to create the 
+        /// The purpose of this method is to create the list of authors by breaking down the 
+        /// RedCapResult JSON. It breaks down every JSON into a person object, and then does a check
+        /// with a dictionary that we are creating to combine partial people objects into one complete 'Person'
         /// </summary>
-        /// <returns></returns>
-        public static IList<Person> CreatePeopleList() {
+        /// <returns>a list of all of the authors</returns>
+        public static IList<Person> CreatePeopleList()
+        {
+            //We run the method to get the JSON file.
             AcquireJSONAndMetaData();
             List<Person> authors = new List<Person>();
             StringReader baseReader = new StringReader(RedCapResult);
             authorshipDictionary = new Dictionary<int, Person>();
             //we use the textReader here to be able to step through every object on its own in the large list of names
-             using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
+            using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
             {
                 //Read moves it to the next token
                 while (jsonReader.Read())
                 {
-                    if(jsonReader.TokenType == JsonToken.StartObject)
+                    if (jsonReader.TokenType == JsonToken.StartObject)
                     {
                         //grab the current token that we're on from the JSonReader
                         JObject currentToken = JObject.Load(jsonReader);
                         JsonSerializer serializer = new JsonSerializer();
-                        //What to do here
-                        //Get the person
-                        //find the person in a dicionary
-                        //If present, update the person with the parts that are present
-                        //When changing from one authorship to the next, add the (hopefully) complete person to the list
-
-                        //This line is operating as expected, now need to look at how to combine people
+                        //We create a person object from the current JSON token
                         Person newAuthor = (Person)serializer.Deserialize(new JTokenReader(currentToken), typeof(Person));
                         if (authorshipDictionary.ContainsKey(newAuthor.authorshipNumber) && authorshipDictionary.TryGetValue(newAuthor.authorshipNumber, out Person oldAuthor))
                         {
+                            //If the author is already in the dictionary, check to merge the newAuthor with the currently existing Author
                             oldAuthor = oldAuthor.CheckAndMerge(newAuthor);
                         }
                         else
                         {
+                            //Add the current author into the dictionary if they are not in it right now
                             authorshipDictionary.Add(newAuthor.authorshipNumber, newAuthor);
                         }
                     }
                 }
             }
-             foreach(Person author in authorshipDictionary.Values)
+            //After finishing merging all of the authors, add them into a list and return the list.
+            foreach (Person author in authorshipDictionary.Values)
             {
                 authors.Add(author);
             }
@@ -102,6 +102,9 @@ namespace AcquireData
         }
 
         /// <summary>
+        /// This is the method that will create all of the dictionaries from the metadata.
+        /// This will be useful later for the analyzation of the OPD returns, particularly the 
+        /// state and company dictionaries.
         /// element 3 = Clinical Degree
         /// Element 9 = States
         /// Element 21, 23, 25 = Type
@@ -115,11 +118,10 @@ namespace AcquireData
             typeDictionary = new Dictionary<int, string>();
             AcquireJSONAndMetaData();
             String[] splitString = MetaDataResult.Split('"');
-            //Next Steps:
-            //Break apart the three elements containing the actual pairs, separating by '|'
-            //then add elements into respective dictionary by breaking apart with ',', element 0 is key, element 2 is value.
             string[] degrees = splitString[3].Split('|');
             //Have to do some special scenarios for degrees as there are values with commas within them
+
+            //TAKE ANOTHER LOOK AT THIS. It might no longer be necessary with the new way things are put in the OPD
             foreach(string pair in degrees)
             {
                 string[] splitPair = pair.Split(',');
@@ -163,6 +165,12 @@ namespace AcquireData
 
         }
 
+        /// <summary>
+        /// Within the redcap there is some typos for the companies. If you find any typos, put them
+        /// in here.
+        /// </summary>
+        /// <param name="company">the company that needs to be checked.</param>
+        /// <returns>if the company is typoed, it returns the fixed company. Else, it returns the company as is.</returns>
         private static string TypoCheck(string company)
         {
             if(company.Equals("Cambrium")) { return "Cambium"; }
@@ -252,6 +260,10 @@ namespace AcquireData
     public static class GetOpdData
     {
         public static readonly string connectionString;
+        /// <summary>
+        /// this is used to get the connection string with the OPD that we will use
+        /// for future commands.
+        /// </summary>
         static GetOpdData()
         {
             var builder = new ConfigurationBuilder();
@@ -270,14 +282,10 @@ namespace AcquireData
 
         }
         /// <summary>
-        /// This method right now is pretty barebones. As of now it just looks through the one OPD file I have, and just starts pulling names
-        /// and putting it into a string array. This is just the base, in the future I'll be implementing search restrictions
-        /// and will be searching through more than just the one file.
+        /// This method has become obsolete now that we are using SQL for searching, but we are going
+        /// to keep it around in cae the SQL method fails in the long run.
         /// 
-        /// I am going to retrofit this method to be the groundwork for the search protocol. It is going to find all of the names, put them
-        /// into a list, and then return it to be reviewed.
-        /// 
-        /// Things to know for parsing (Post 2016)
+        /// Things to know for parsing
         /// 5 = Physician ID
         /// 6 = First Name
         /// 7 = Middle Name
@@ -310,20 +318,7 @@ namespace AcquireData
                 // throw new ArgumentException("Error. Did Not find anybody with the same first and last name from OPD.");
                 return matches;
             }
-            //    bool allSameID = true;
-            //   string physicianID = matches[0][5];
-            //This private helper method will check if all of the ID's in the list are the same.
-            //   allSameID = IDChecker(physicianID, matches);
-            //If all of the physicians have the same ID, then return the list.
-            //ERROR. do not return list yet. we want to confirm the person we found is the right person.
-            //if (allSameID)
-            //{
-            //    return matches;
-            //}
-            //Otherwise, get more specific
-            //   else
-            // {
-            // List<string[]> duplicateMatches = matches;
+
             List<String[]> duplicateMatches = new List<string[]>(matches);
                 foreach(string[] author in duplicateMatches)
                 {
@@ -370,6 +365,7 @@ namespace AcquireData
         /// <returns>a list of all the author's with the same first name, last name, and either the same city and state or the same state if an author in the same city cannot be found</returns>
         public static IList<String[]> FindPeopleFromOPDSQL(string first, string last, string city, string state,string table, string receiveDate)
         {
+            //We use the Redcapdate to make sure that it's within the proper timeframe.
             DateTime RedcapDate = DateTime.Parse(receiveDate);
             List<String[]> OPDOutputs = new List<String[]>();
             List<String[]> sameCityState = new List<String[]>();
@@ -390,9 +386,6 @@ namespace AcquireData
                                 String[] fields = new string[reader.FieldCount];
                                 for (int i = 0; i < fields.Length; i++)
                                 {
-                                    //due to the nature of the Table, all entries have leading and ending quotes. These couple of lines are to remove those quotes.
-                                    //string currentField = reader[i].ToString();
-                                    //currentField = currentField.Replace("\"", "");
                                     fields[i] = reader[i].ToString();
                                 }
                                 //We don't check the timeframe here because it will get sorted later.
@@ -401,6 +394,7 @@ namespace AcquireData
                         }
                     }
                     con.Close();
+                    //Now we do a check to make sure that they are in the same city and state as the author.
                     foreach (string[] row in OPDOutputs)
                     {
                         if (row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
@@ -443,6 +437,13 @@ namespace AcquireData
             return matchingID;
         }
 
+        /// <summary>
+        /// This is the method to make sure that the OPD entry is within the timeframe of relevancy for the journal. 
+        /// If it isn't the method returns false and the entry will not be added to the final list of entries.
+        /// </summary>
+        /// <param name="RedcapDate">the receivedate of the article</param>
+        /// <param name="opdDate"> the OPD date that is being checked</param>
+        /// <returns>true if the OPD date is within the timeframe, false if not.</returns>
         private static bool WithinTimeFrame(DateTime RedcapDate, DateTime opdDate)
         {
             //First, we must check if the OPD date is newer than the Redcap date, if it is, throw it out. 
@@ -464,19 +465,13 @@ namespace AcquireData
             return true;
         }
 
-        private static bool IDChecker(string ID, List<String[]> authors)
-        {
-            foreach (string[] row in authors)
-            {
-                if (!(row[5].Equals(ID)))
-                {
-                    return false;
-                }
-            }
-            return true;
-
-        }
-
+        /// <summary>
+        /// This method uses Eileen's program that is on the SQL database and tries to find their author
+        /// position. This is used in the analysis method in the main console method.
+        /// </summary>
+        /// <param name="first">the author's first name</param>
+        /// <param name="last">the author's last name</param>
+        /// <returns>their position, if it can be found</returns>
         public static string FindAuthorPosition(string first, string last)
         {
             string position = "";
@@ -491,7 +486,7 @@ namespace AcquireData
                     {
                         while (reader.Read())
                         {
-                            position = reader.GetString(0); //
+                            position = reader.GetString(0); 
                         }
                     }
                 }

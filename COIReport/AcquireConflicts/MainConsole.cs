@@ -21,6 +21,7 @@ namespace RedcapApiDemo
             Console.WriteLine("Attempting to acquire report and data dictionary");
             try
             {
+                //Here we get all of the authors from the RedCap report.
                 authors = (List<Person>)AcquireData.GetData.CreatePeopleList();
                 AcquireData.GetData.CreateDictionaries();
             }
@@ -32,22 +33,16 @@ namespace RedcapApiDemo
             //foreach(Person author in authors)
             for (int i = 5; i < 6; i++)
             {
-                //This is just for the test. Do not let this stay in!!
                 searchResults = new List<String[]>();
 
                 Person author = authors[i];
                  Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
                 //Console.WriteLine(author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
-
-                //What I want to do in this loop.
-                //Break down the author to get parameters for FindPeopleFromOPD
-                //need to convert state from number to string using metadata.
-                //then need to try to do the method and catch any exceptions.
-                //if no exceptions caught, then do comparisons.
-                //Repeat this for all 3 categories of payments for 4 years back from the receive date
                 List<String[]> results = new List<String[]>();
                 try
                 {
+                    //While all of these threads are commented out, I will keep them in just in case we need to abandon the SQL method,
+                    //At which point threads are the best way of searching all of the years.
                     string[] dates = author.receiveddate.Split('-');
                     int year = int.Parse(dates[0]);
                     //Thread Thread2018 = new Thread(()=>VoidSearchOPD(2018, author));
@@ -58,12 +53,6 @@ namespace RedcapApiDemo
                     //Thread Thread2013 = new Thread(() => VoidSearchOPD(2013, author));
                     if (year == 2018)
                     {
-                        //Thread Thread2018 = new Thread(() => SearchOPD(2018, author));
-                        //Thread2018.Start();
-                        //results.AddRange(SearchOPD(2018, author));
-                        //results.AddRange(SearchOPD(2017, author));
-                        //results.AddRange(SearchOPD(2016, author));
-                        //results.AddRange(SearchOPD(2015, author));
                         //Thread2018.Start();
                         //Thread2017.Start();
                         //Thread2016.Start();
@@ -79,10 +68,6 @@ namespace RedcapApiDemo
                     }
                     else if (year == 2017)
                     {
-                        //results.AddRange(SearchOPD(2017, author));
-                        //results.AddRange(SearchOPD(2016, author));
-                        //results.AddRange(SearchOPD(2015, author));
-                        //results.AddRange(SearchOPD(2014, author));
                         //Thread2017.Start();
                         //Thread2016.Start();
                         //Thread2015.Start();
@@ -98,10 +83,6 @@ namespace RedcapApiDemo
                     }
                     else if (year == 2016)
                     {
-                        //results.AddRange(SearchOPD(2016, author));
-                        //results.AddRange(SearchOPD(2015, author));
-                        //results.AddRange(SearchOPD(2014, author));
-                        //results.AddRange(SearchOPD(2013, author));
                         //Thread2016.Start();
                         //Thread2015.Start();
                         //Thread2014.Start();
@@ -117,9 +98,6 @@ namespace RedcapApiDemo
                     }
                     else if (year == 2015)
                     {
-                        //results.AddRange(SearchOPD(2015, author));
-                        //results.AddRange(SearchOPD(2014, author));
-                        //results.AddRange(SearchOPD(2013, author));
                         //Thread2015.Start();
                         //Thread2014.Start();
                         //Thread2013.Start();
@@ -133,8 +111,6 @@ namespace RedcapApiDemo
                     }
                     else if (year == 2014)
                     {
-                        //results.AddRange(SearchOPD(2014, author));
-                        //results.AddRange(SearchOPD(2013, author));
                         //Thread2014.Start();
                         //Thread2013.Start();
                         //Thread2014.Join();
@@ -145,7 +121,6 @@ namespace RedcapApiDemo
                     }
                     else if (year == 2013)
                     {
-                        //results.AddRange(SearchOPD(2013, author));
                         //Thread2013.Start();
                         //Thread2013.Join();
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2013", author.receiveddate));
@@ -155,6 +130,7 @@ namespace RedcapApiDemo
                 {
                     Console.WriteLine(e.Message);
                 }
+                //This was just for testing purposes.
                 //OutputToCSV(searchResults);
                 if (searchResults.Count > 0) { AnalyzeOPDList(searchResults, author); }
                 else
@@ -164,6 +140,12 @@ namespace RedcapApiDemo
             }
         }
 
+        /// <summary>
+        /// this method is used by the threads to search the OPD. right now it is not being used but if the threads have to
+        /// be used again this is the method they use.
+        /// </summary>
+        /// <param name="year">the year to search</param>
+        /// <param name="author">the author being searched</param>
         private static void VoidSearchOPD(int year, Person author)
         {
             searchResults.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
@@ -175,17 +157,11 @@ namespace RedcapApiDemo
 
         }
 
-        private static IList<String[]> SearchOPD(int year, Person author)
-        {
-            List<String[]> results = (List<String[]>)GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                     @$"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_GNRL_PGYR{year}_P01172020.csv");
-            results.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_OWNRSHP_PGYR{year}_P01172020.csv"));
-            results.AddRange(GetOpdData.FindPeopleFromOPD(author.first, author.last, author.middle, author.city, GetData.stateDictionary[int.Parse(author.state)],
-                    $@"C:\Users\devin\OneDrive\Documents\COI Report\OPD CSVs\{year}\OP_DTL_RSRCH_PGYR{year}_P01172020.csv"));
-            return results;
-        }
-
+        /// <summary>
+        /// This method uses a filewriter to create an excel sheet. It was used for testing and reviewing that
+        /// we were finding the right author.
+        /// </summary>
+        /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
             string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\AuthorSearchOutput2.csv";
@@ -204,7 +180,18 @@ namespace RedcapApiDemo
             }
         }
 
-        //Next step to perform: Analyze the list acquired from the OPD and then compare if all of the companies listed in the OPD match with the companies that they listed.
+        /// <summary>
+        /// This is the method to analyze the results from the OPD list and find any
+        /// Discrepancies. 
+        /// 
+        /// There are two forms of discrepancies that we are looking for: 
+        /// 1) The author did not report the company, but that company was found within the OPD
+        /// 2) The author did report the company, but said company was not found within the OPD
+        /// 
+        /// Any discrepancies will be Output in the console to be viewed.
+        /// </summary>
+        /// <param name="rows">the OPD entries</param>
+        /// <param name="author">the author being analyzed.</param>
         static void AnalyzeOPDList(List<String[]> rows, Person author)
         {
             List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
@@ -227,10 +214,6 @@ namespace RedcapApiDemo
                 //If there is an OPD entry that has a company that is not in the list of companies the author reported,
                 //Then there is a discrepancy that must be shown to the user.
 
-                //WARNING: try not to do a direct match. maybe try and split the name apart and compare words together. if majority of words match, then its a hit.
-                //what if the author reported a non-profit like the National Eye Institute
-                //Maybe only compare the first part of the name together.
-              //  if (!(authorCompanies.Contains(OPDEntry[25])))
                 if(!(findCompany(OPDEntry[25], authorCompanies)))
                 {
                     Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
@@ -238,40 +221,9 @@ namespace RedcapApiDemo
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
                 {
-                    //We then remove that company from the list. This will help us later to print out all of the companies that the author reported that were not found in the OPD
-                    //ERROR: Cannot delete the author in the case of multiple entries from the company to the author.
-                    //FIX: do a loop one way (OPD to author) and then do another loop the other way (author to OPD) to try and find both types of discrepancies.
-                    //     this should not be a huge waste of time as the data should still be very small.
-                    //OTHER METHOD: create a list of companies that are a 'hit' and then against the author list to see any companies that are not a hit and report those
-                    //              companies as discrepancies.
                     companyHits.Add(companyHitString);
                 }
             }
-            //After the loop, we check to see if there are any companies that were reported by the author, but not reported by the 
-            //if(companyHits.Count > 0)
-            //{
-            //    //The method here is to go through the set and remove any hits from the authorCompany list.
-            //    //After that, if the redcap list is not empty, then there are discrepancies.
-            //    foreach(string company in companyHits)
-            //    {
-            //        if(findCompany(company, authorCompanies))
-            //        {
-            //            authorCompanies.Remove(company);
-            //        }
-            //    }
-            //    //after the string, we check to see if there are any companies left that aren't 'other'
-            //    if(authorCompanies.Count > 0)
-            //    {
-            //        //If there are more companies, report them as discrepancies
-            //        foreach(string remainingCompany in authorCompanies)
-            //        {
-            //            if (!(remainingCompany.Equals("other")))
-            //            {
-            //                Console.WriteLine($"DISCREPANCY: Company {remainingCompany} was reported by author but not found within the OPD.");
-            //            }
-            //        }
-            //    }
-            //}
             //This if statement is to catch if there were not 'hits', but the author still had companies reported.
             if(companyHits.Count == 0 && !(authorCompanies[0].Equals("")))
             {
@@ -283,10 +235,12 @@ namespace RedcapApiDemo
             //This else statement is for finding the remaining companies that were hits
             else if(companyHits.Count != 0)
             {
+                //As we find hits, we remove them from the company list.
                 foreach(string hit in companyHits)
                 {
                     authorCompanies.Remove(hit);
                 }
+                //If there are any companies left, then there are companies the author reported that were not found within the OPD
                 if(authorCompanies.Count > 0)
                 {
                     foreach(string company in authorCompanies)
@@ -314,17 +268,6 @@ namespace RedcapApiDemo
         {
             foreach(string company in RedCapCompanies)
             {
-                //if (!(company.Equals("")))
-                //{
-                //    string[] rowEntrySplit = rowCompanyEntry.Split(' ');
-                //    if(rowEntrySplit[0].ToUpper().Equals("the".ToUpper()))
-                //    {
-                //      if (RedCapCompanies.Contains(rowEntrySplit[1])) { return true; }
-
-                //    }
-                //    else if (RedCapCompanies.Contains(rowEntrySplit[0])) { return true; }  
-                //}
-
                 //Revamping the method! I'm flipping it now to see if the Redcap company (which is smaller, one word) is found within the larger
                 //OPD Company name. This should make it simpler to check. 
                 if(rowCompanyEntry.ToUpper().Contains(company.ToUpper()) && !(company.Equals(""))) 
