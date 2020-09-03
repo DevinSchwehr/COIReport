@@ -31,12 +31,12 @@ namespace RedcapApiDemo
             }
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 5; i < 6; i++)
+            for (int i = 0; i < 11; i++)
             {
                 searchResults = new List<String[]>();
 
                 Person author = authors[i];
-                 Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
+                 Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)] + " Authorship #: " + author.authorshipNumber + " Receive Date: " + author.receiveddate);
                 //Console.WriteLine(author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
                 List<String[]> results = new List<String[]>();
                 try
@@ -64,6 +64,7 @@ namespace RedcapApiDemo
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2018", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2017", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2016", author.receiveddate));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2015", author.receiveddate));
 
                     }
                     else if (year == 2017)
@@ -79,6 +80,7 @@ namespace RedcapApiDemo
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2017", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2016", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2015", author.receiveddate));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2014", author.receiveddate));
 
                     }
                     else if (year == 2016)
@@ -94,6 +96,7 @@ namespace RedcapApiDemo
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2016", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2015", author.receiveddate));
                         searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2014", author.receiveddate));
+                        searchResults.AddRange(GetOpdData.FindPeopleFromOPDSQL(author.first, author.last, author.city, GetData.stateDictionary[int.Parse(author.state)], "OPD_GNRL_2013", author.receiveddate));
 
                     }
                     else if (year == 2015)
@@ -164,7 +167,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\AuthorSearchOutput2.csv";
+            string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\PaymentOutputs.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
@@ -194,8 +197,13 @@ namespace RedcapApiDemo
         /// <param name="author">the author being analyzed.</param>
         static void AnalyzeOPDList(List<String[]> rows, Person author)
         {
+            SortAlphabetically(rows);
             List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
             string[] authorNumberedCompanies = author.companiesNumbered.Split(',');
+            //we find the author's position here to use later.
+            string position = GetOpdData.FindAuthorPosition(author.first, author.last);
+            //This List will be used to output the results to a csv
+            List<String[]> outputs = new List<String[]>();
             //This list is to do a reverse comparison from author reported companies to the OPD to see if any companies did not 
             //Report a payment where the author did
             HashSet<String> companyHits = new HashSet<string>();
@@ -216,14 +224,21 @@ namespace RedcapApiDemo
 
                 if(!(findCompany(OPDEntry[25], authorCompanies)))
                 {
-                    Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
+
+                    string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Undisclosed", OPDEntry[25], OPDEntry[26], OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], OPDEntry[34], OPDEntry[33], OPDEntry[30] };
+                    outputs.Add(currentLine);                   
+                    // Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
                 {
+                    string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Reported", OPDEntry[25], OPDEntry[26], OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], OPDEntry[34], OPDEntry[33], OPDEntry[30] };
+                    outputs.Add(currentLine);
+                   // Console.WriteLine($"SUCCESSFUL MATCH: Author reported company {OPDEntry[25]} in their list of companies.");
                     companyHits.Add(companyHitString);
                 }
             }
+            OutputToCSV(outputs);
             //This if statement is to catch if there were not 'hits', but the author still had companies reported.
             if(companyHits.Count == 0 && !(authorCompanies[0].Equals("")))
             {
@@ -254,6 +269,23 @@ namespace RedcapApiDemo
             }
         }
 
+        //private static string PaymentSubtype(string[] OPDEntry, Person author)
+        //{
+        //    if (OPDEntry[OPDEntry.Length - 1].Equals("General"))
+        //    {
+        //       GetData.typeDictionary(author)
+        //    }
+        //}
+
+        private static void SortAlphabetically(List<string[]> rows)
+        {
+            rows.Sort(CompareByName);
+        }
+
+        private static int CompareByName(string[] firstRow, string[] secondRow)
+        {
+            return string.Compare(firstRow[25], secondRow[25]);
+        }
 
         /// <summary>
         /// The purpose of this method is to try and match the correct companies from the RedCap entry to the entry from the OPD row. 

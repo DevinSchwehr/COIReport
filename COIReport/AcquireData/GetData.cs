@@ -178,6 +178,8 @@ namespace AcquireData
             if(company.Equals("Aldevra")) { return "Aldeyra"; }
             if(company.Equals("ophthea")) { return "opthea"; }
             if(company.Equals("Abbot")) { return "Abbott";   }
+            if(company.Equals("Abbot Medical Optics aka AMO")) { return "Abbott"; }
+            if(company.Equals("Dutch Ophthalmic Research Center (DORC)")) { return "Dutch Ophthalmic"; }
             return company;
         }
 
@@ -379,15 +381,19 @@ namespace AcquireData
                     //This command will query the database for any author with the same first and last name
                     using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
                     {
+                        command.CommandTimeout = 200;
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                String[] fields = new string[reader.FieldCount];
+                                String[] fields = new string[reader.FieldCount+1];
                                 for (int i = 0; i < fields.Length; i++)
                                 {
                                     fields[i] = reader[i].ToString();
                                 }
+                                if(table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
+                                else if(table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
+                                else if(table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
                                 //We don't check the timeframe here because it will get sorted later.
                                 OPDOutputs.Add(fields);
                             }
@@ -406,6 +412,7 @@ namespace AcquireData
                         con.Open();
                         using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
                         {
+                            command.CommandTimeout = 200;
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -453,7 +460,7 @@ namespace AcquireData
                 return false;
             }
             //Now we must make the check to see if the entry is too old to be accepted. If it is, toss it. 
-            else if(RedcapDate.Year - opdDate.Year ==2 )
+            else if(RedcapDate.Year - opdDate.Year ==3 )
             {
                 // If the OPD month is smaller than the Redcap month, then it is outside of the period and should be tossed.
                 if(opdDate.Month.CompareTo(RedcapDate.Month) < 0)
@@ -490,6 +497,7 @@ namespace AcquireData
                         }
                     }
                 }
+                con.Close();
             }
             }
             catch(SqlException e)
