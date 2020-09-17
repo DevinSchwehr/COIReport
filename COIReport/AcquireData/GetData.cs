@@ -65,6 +65,9 @@ namespace AcquireData
             List<Person> authors = new List<Person>();
             StringReader baseReader = new StringReader(RedCapResult);
             authorshipDictionary = new Dictionary<int, Person>();
+            //Creating our specific list of people
+            List<string[]> specificAuthors = GetOPDAndSQLData.getSpecificAuthors();
+
             //we use the textReader here to be able to step through every object on its own in the large list of names
             using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
             {
@@ -94,12 +97,17 @@ namespace AcquireData
             //After finishing merging all of the authors, add them into a list and return the list.
             foreach (Person author in authorshipDictionary.Values)
             {
-                authors.Add(author);
+                //If they are in the set of sample data, then add them to the list.
+                if(InTestSample(specificAuthors, author))
+                {
+                    authors.Add(author);
+                }
             }
 
             return authors;
 
         }
+
 
         /// <summary>
         /// This is the method that will create all of the dictionaries from the metadata.
@@ -165,6 +173,14 @@ namespace AcquireData
 
         }
 
+        private static bool InTestSample(List<string[]> specificAuthors, Person author)
+        {
+            foreach(string[] set in specificAuthors)
+            {
+              if(author.first.Equals(set[0].ToUpper()) && author.last.Equals(set[1].ToUpper())) { return true; }  
+            }
+            return false;
+        }
         /// <summary>
         /// Within the redcap there is some typos for the companies. If you find any typos, put them
         /// in here.
@@ -259,14 +275,14 @@ namespace AcquireData
     /// <summary>
     /// This class is responsible for pulling data from the OPD and will be responsible for searching through it when looking for a specific name.
     /// </summary>
-    public static class GetOpdData
+    public static class GetOPDAndSQLData
     {
         public static readonly string connectionString;
         /// <summary>
         /// this is used to get the connection string with the OPD that we will use
         /// for future commands.
         /// </summary>
-        static GetOpdData()
+        static GetOPDAndSQLData()
         {
             var builder = new ConfigurationBuilder();
 
@@ -372,6 +388,7 @@ namespace AcquireData
             List<String[]> OPDOutputs = new List<String[]>();
             List<String[]> sameCityState = new List<String[]>();
             List<String[]> matchingID = new List<String[]>();
+            List<String[]> specificAuthors = new List<String[]>();
             //The following try block is the process of querying the database to get the authors.
             try
             {
@@ -381,13 +398,13 @@ namespace AcquireData
                     //This command will query the database for any author with the same first and last name
                     using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
                     {
-                        command.CommandTimeout = 200;
+                        command.CommandTimeout = 5000;
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 String[] fields = new string[reader.FieldCount+1];
-                                for (int i = 0; i < fields.Length; i++)
+                                for (int i = 0; i < fields.Length-1; i++)
                                 {
                                     fields[i] = reader[i].ToString();
                                 }
@@ -412,16 +429,19 @@ namespace AcquireData
                         con.Open();
                         using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
                         {
-                            command.CommandTimeout = 200;
+                            command.CommandTimeout = 5000;
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
-                                    String[] fields = new string[reader.FieldCount];
-                                    for (int i = 0; i < fields.Length; i++)
+                                    String[] fields = new string[reader.FieldCount+1];
+                                    for (int i = 0; i < fields.Length-1; i++)
                                     {
                                         fields[i] = reader[i].ToString();
                                     }
+                                    if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
+                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
+                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
                                     //Now we check to make sure the date is within the current timeframe.
                                     DateTime OpdDate = DateTime.Parse(fields[31]);
                                     if (WithinTimeFrame(RedcapDate, OpdDate))
@@ -487,8 +507,9 @@ namespace AcquireData
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
+                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions2019 where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
                 {
+                    command.CommandTimeout = 1000;
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
@@ -508,6 +529,37 @@ namespace AcquireData
             else if(position.Equals("m")) { return "Position: Middle"; }
             else if (position.Equals("l")) { return "Position: Last"; }
             else { return "Position not found"; }
+        }
+
+        /// <summary>
+        /// This is the primary difference from the SQL Branch as this is going to be used to find
+        /// a specific list of authors.
+        /// </summary>
+        /// <returns></returns>
+        public static List<string[]> getSpecificAuthors()
+        {
+            List<string[]> specificAuthors = new List<string[]>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            { 
+                con.Open();
+                using (SqlCommand command = new SqlCommand("Select first, last from TestSample", con))
+                {
+                    command.CommandTimeout = 500;
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string[] fields = new string[reader.FieldCount];
+                            for (int i = 0; i < fields.Length; i++)
+                            {
+                                fields[i] = reader[i].ToString();
+                            }
+                            specificAuthors.Add(fields);
+                        }
+                    }
+                }
+            }
+            return specificAuthors;
         }
 
     }

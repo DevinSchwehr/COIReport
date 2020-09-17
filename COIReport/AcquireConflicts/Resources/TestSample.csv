@@ -1,0 +1,122 @@
+authorshipnumber,redcap_repeat_instrument,redcap_repeat_instance,receiveddate,last,first,type3,entity3,freetextentityother3
+2916,,,2018-04-17,Rose-Nussbaumer,Jennifer,,,
+2916,relationship3,1,,,,7,"154,207",
+2917,,,2017-12-21,Samuelson,Thomas,,,
+2917,relationship3,1,,,,4,"2,4,11,15,211",Glaukos
+2917,relationship3,2,,,,4,2,Ivantis
+2917,relationship3,3,,,,4,2,"Transcend Medical"
+2917,relationship3,4,,,,5,2,Ivantis
+2917,relationship3,5,,,,5,2,Glaukos
+2917,relationship3,6,,,,4,2,AqueSys
+2918,,,2017-12-21,Chang,David,,,
+2918,relationship3,1,,,,4,2,Ivantis
+2920,,,2017-12-21,Flowers,Brian,,,
+2920,relationship3,1,,,,4,"2,11",Ivantis
+2920,relationship3,2,,,,4,2,Glaukos
+2920,relationship3,3,,,,4,2,InnFocus
+2920,relationship3,4,,,,4,2,"Sight Sciences"
+2920,relationship3,5,,,,4,2,"New World Medical"
+2920,relationship3,6,,,,7,"2,11",Ivantis
+2920,relationship3,7,,,,7,2,Glaukos
+2920,relationship3,8,,,,7,2,InnFocus
+2920,relationship3,9,,,,7,2,"Sight Sciences"
+2920,relationship3,10,,,,7,2,"New World Medical"
+2930,,,2018-02-14,Liebmann,Jeffrey,,,
+2930,relationship3,1,,,,4,"11,15,33,50,99,204,242",
+2930,relationship3,2,,,,10,"33,50,99,184,204,234",
+2931,,,2018-02-14,Girkin,Christopher,,,
+2931,relationship3,1,,,,10,"2,50,99",SOLX
+2950,,,2018-02-14,Medeiros,Felipe,,,
+2950,relationship3,1,,,,4,"15,50,166",
+2950,relationship3,2,,,,10,"11,15,33,50,99,148,204,218,234",
+2950,relationship3,3,,,,7,"11,15,50,204",
+2961,,,2018-02-14,Weinreb,Robert,,,
+2961,relationship3,1,,,,4,"8,15,79,240",
+2961,relationship3,2,,,,10,"33,50,54,87,99,184,234",
+2967,,,2018-03-27,Medeiros,Felipe,,,
+2967,relationship3,1,,,,4,"11,15,33,50,99,148,204,218,234",
+2967,relationship3,2,,,,7,"11,15,33,50,99,148,204,218,234",
+2992,,,2018-06-05,Sun,Jennifer,,,
+2992,relationship3,1,,,,10,"2,15,34,44,74,87,127,132,148,166,167,184,202","Boston Micromachines"
+2992,relationship3,2,,,,10,2,"Vindico Medical Education"
+2992,relationship3,3,,,,10,2,"Current Diabetes Reports"
+2992,relationship3,4,,,,10,2,"Adaptive Sensory Technologies"
+2996,,,2018-06-05,Bressler,Neil,,,
+2996,relationship3,1,,,,10,"2,34,87,166,209","Samsung Bioepis"
+2998,,,2018-06-05,Gross,Jeffrey,,,
+2998,relationship3,1,,,,10,"6,87,174,202",
+3015,,,2018-06-10,Sadda,SriniVas,,,
+3015,relationship3,1,,,,4,"15,50,54,87,99,106,166,183,184,202,232",
+3015,relationship3,2,,,,7,"15,50,54,87,99,106,166,183,184,202,232",
+3042,,,2018-04-23,Coffin,Susan,,,
+3042,relationship3,1,,,,7,"2,156",CDC
+3042,relationship3,2,,,,7,2,"Agency for Healthcare Research and Quality"
+3042,relationship3,3,,,,7,2,"Thrasher Foundation"
+3042,relationship3,4,,,,10,2,"Medical Legal"
+3058,,,2017-08-30,Liebmann,Jeffrey,,,
+3058,relationship3,1,,,,4,"11,15,33,50,99,204,242",
+3058,relationship3,2,,,,10,"33,50,99,154,184,204,234",
+3059,,,2017-08-30,Girkin,Christopher,,,
+3059,relationship3,1,,,,10,"2,50,99",SOLX
+3087,,,2017-08-30,Medeiros,Felipe,,,
+3087,relationship3,1,,,,4,"15,50,166",
+3087,relationship3,2,,,,10,"11,15,33,50,99,148,204,218,234",
+3100,,,2017-08-30,Weinreb,Robert,,,
+3100,relationship3,1,,,,4,"8,11,15,33,79,218",
+3100,relationship3,2,,,,10,"50,87,99,184,234",
+3107,,,2018-04-23,Yoo,Sonia,,,
+3107,relationship3,1,,,,4,"50,126",
+3151,,,2018-04-07,Jaffe,Glenn,,,
+3151,relationship3,1,,,,4,"99,166",
+3153,,,2018-04-07,Toth,Cynthia,,,
+3153,relationship3,1,,,,9,11,
+3173,,,2018-05-01,Thorne,Jennifer,,,
+3173,relationship3,1,,,,7,15,
+3173,relationship3,2,,,,4,"5,91,211",
+3178,,,2018-05-01,Vitale,Albert,,,
+3178,relationship3,1,,,,4,"2,5",Aciont
+3179,,,2018-05-01,Acharya,Nisha,,,
+3179,relationship3,1,,,,10,"5,211",
+3180,,,2018-05-01,Kempen,John,,,
+3180,relationship3,1,,,,4,"91,211",
+3187,,,2018-03-22,Gombos,Dan,,,
+3187,relationship3,1,,,,4,"2,5,30,51","3T Ophthalmics"
+3213,,,2018-07-09,Huang,Abigail,,,
+3213,relationship3,1,,,,4,2,"Adecco Group North America"
+3220,,,2018-07-09,Chiang,Michael,,,
+3220,relationship3,1,,,,4,"2,166","Clarity Medical Systems"
+3220,relationship3,2,,,,6,2,Inteleretina
+3235,,,2018-01-13,Robin,Alan,,,
+3235,relationship3,1,,,,4,2,"Aravind Eye Foundation"
+3295,,,2018-04-20,Uhr,Joshua,,,
+3295,relationship3,1,,,,4,237,
+3295,relationship3,2,,,,10,"87,181,209,211",
+3299,,,2018-04-20,Regillo,Carl,,,
+3299,relationship3,1,,,,4,"11,15,87,106,165",
+3299,relationship3,2,,,,10,"15,87,106,166,202,209",
+3300,,,2018-04-20,Maguire,Joseph,,,
+3300,relationship3,1,,,,4,87,
+3300,relationship3,2,,,,11,202,
+3301,,,2018-04-20,Garg,Sunir,,,
+3301,relationship3,1,,,,4,"2,211",Deciphera
+3301,relationship3,2,,,,10,"9,15,77",
+3318,,,2018-02-16,Callanan,David,,,
+3318,relationship3,1,,,,4,"5,15,94,202,211",
+3320,,,2018-02-16,Srivastava,Sunil,,,
+3320,relationship3,1,,,,7,"15,33,61,198,211",
+3320,relationship3,2,,,,4,"15,33,61,91,183,198,202,210,211",
+3325,,,2018-02-16,Vitti,Robert,,,
+3325,relationship3,1,,,,6,202,
+3326,,,2018-02-16,Erickson,Kristine,,,
+3326,relationship3,1,,,,6,202,
+3327,,,2018-02-16,Athanikar,Aditya,,,
+3327,relationship3,1,,,,6,202,
+3329,,,2018-02-16,Saroj,Namrata,,,
+3329,relationship3,1,,,,6,202,
+3331,,,2018-02-16,Varona,Rafael,,,
+3331,relationship3,1,,,,6,210,
+3333,,,2018-02-16,Buggage,Ronald,,,
+3333,relationship3,1,,,,6,210,
+3336,,,2018-02-16,Nguyen,Quan,,,
+3336,relationship3,1,,,,7,202,
+3336,relationship3,2,,,,4,202,
