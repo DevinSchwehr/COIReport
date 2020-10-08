@@ -101,6 +101,7 @@ namespace AcquireData
 
         }
 
+
         /// <summary>
         /// This is the method that will create all of the dictionaries from the metadata.
         /// This will be useful later for the analyzation of the OPD returns, particularly the 
@@ -180,6 +181,8 @@ namespace AcquireData
             if(company.Equals("Abbot")) { return "Abbott";   }
             if(company.Equals("Abbot Medical Optics aka AMO")) { return "Abbott"; }
             if(company.Equals("Dutch Ophthalmic Research Center (DORC)")) { return "Dutch Ophthalmic"; }
+            if(company.Equals("Notal Vision")) { return "NotalVision"; }
+            if(company.Equals("Bausch and Lomb")) { return "Bausch"; }
             return company;
         }
 
@@ -259,14 +262,14 @@ namespace AcquireData
     /// <summary>
     /// This class is responsible for pulling data from the OPD and will be responsible for searching through it when looking for a specific name.
     /// </summary>
-    public static class GetOpdData
+    public static class GetOPDAndSQLData
     {
         public static readonly string connectionString;
         /// <summary>
         /// this is used to get the connection string with the OPD that we will use
         /// for future commands.
         /// </summary>
-        static GetOpdData()
+        static GetOPDAndSQLData()
         {
             var builder = new ConfigurationBuilder();
 
@@ -381,13 +384,13 @@ namespace AcquireData
                     //This command will query the database for any author with the same first and last name
                     using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
                     {
-                        command.CommandTimeout = 200;
+                        command.CommandTimeout = 5000;
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
                                 String[] fields = new string[reader.FieldCount+1];
-                                for (int i = 0; i < fields.Length; i++)
+                                for (int i = 0; i < fields.Length-1; i++)
                                 {
                                     fields[i] = reader[i].ToString();
                                 }
@@ -412,16 +415,19 @@ namespace AcquireData
                         con.Open();
                         using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
                         {
-                            command.CommandTimeout = 200;
+                            command.CommandTimeout = 5000;
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
-                                    String[] fields = new string[reader.FieldCount];
-                                    for (int i = 0; i < fields.Length; i++)
+                                    String[] fields = new string[reader.FieldCount+1];
+                                    for (int i = 0; i < fields.Length-1; i++)
                                     {
                                         fields[i] = reader[i].ToString();
                                     }
+                                    if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
+                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
+                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
                                     //Now we check to make sure the date is within the current timeframe.
                                     DateTime OpdDate = DateTime.Parse(fields[31]);
                                     if (WithinTimeFrame(RedcapDate, OpdDate))
@@ -487,8 +493,9 @@ namespace AcquireData
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
+                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions2019 where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
                 {
+                    command.CommandTimeout = 1000;
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
