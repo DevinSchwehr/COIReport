@@ -32,7 +32,7 @@ namespace RedcapApiDemo
             
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 30; i < authors.Count; i++)
+            for (int i = 42; i < authors.Count; i++)
             {
                 searchResults = new List<String[]>();
 
@@ -168,7 +168,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\PaymentOutputs2.csv";
+            string filePath = @"C:\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\\PaymentOutputsJenniferTest.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();

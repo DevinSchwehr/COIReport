@@ -196,6 +196,8 @@ namespace AcquireData
             if(company.Equals("Abbot")) { return "Abbott";   }
             if(company.Equals("Abbot Medical Optics aka AMO")) { return "Abbott"; }
             if(company.Equals("Dutch Ophthalmic Research Center (DORC)")) { return "Dutch Ophthalmic"; }
+            if(company.Equals("Notal Vision")) { return "NotalVision"; }
+            if(company.Equals("Bausch and Lomb")) { return "Bausch"; }
             return company;
         }
 
