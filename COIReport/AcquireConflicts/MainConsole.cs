@@ -32,7 +32,7 @@ namespace RedcapApiDemo
             
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 42; i < authors.Count; i++)
+            for (int i = 112; i < authors.Count; i++)
             {
                 searchResults = new List<String[]>();
 
