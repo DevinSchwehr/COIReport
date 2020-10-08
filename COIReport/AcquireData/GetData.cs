@@ -65,6 +65,9 @@ namespace AcquireData
             List<Person> authors = new List<Person>();
             StringReader baseReader = new StringReader(RedCapResult);
             authorshipDictionary = new Dictionary<int, Person>();
+            //Creating our specific list of people
+            List<string[]> specificAuthors = GetOPDAndSQLData.getSpecificAuthors();
+
             //we use the textReader here to be able to step through every object on its own in the large list of names
             using (JsonTextReader jsonReader = new JsonTextReader(baseReader))
             {
@@ -94,7 +97,11 @@ namespace AcquireData
             //After finishing merging all of the authors, add them into a list and return the list.
             foreach (Person author in authorshipDictionary.Values)
             {
-                authors.Add(author);
+                //If they are in the set of sample data, then add them to the list.
+                if(InTestSample(specificAuthors, author))
+                {
+                    authors.Add(author);
+                }
             }
 
             return authors;
@@ -166,6 +173,14 @@ namespace AcquireData
 
         }
 
+        private static bool InTestSample(List<string[]> specificAuthors, Person author)
+        {
+            foreach(string[] set in specificAuthors)
+            {
+              if(author.first.Equals(set[0].ToUpper()) && author.last.Equals(set[1].ToUpper())) { return true; }  
+            }
+            return false;
+        }
         /// <summary>
         /// Within the redcap there is some typos for the companies. If you find any typos, put them
         /// in here.
@@ -375,6 +390,7 @@ namespace AcquireData
             List<String[]> OPDOutputs = new List<String[]>();
             List<String[]> sameCityState = new List<String[]>();
             List<String[]> matchingID = new List<String[]>();
+            List<String[]> specificAuthors = new List<String[]>();
             //The following try block is the process of querying the database to get the authors.
             try
             {
@@ -515,6 +531,37 @@ namespace AcquireData
             else if(position.Equals("m")) { return "Position: Middle"; }
             else if (position.Equals("l")) { return "Position: Last"; }
             else { return "Position not found"; }
+        }
+
+        /// <summary>
+        /// This is the primary difference from the SQL Branch as this is going to be used to find
+        /// a specific list of authors.
+        /// </summary>
+        /// <returns></returns>
+        public static List<string[]> getSpecificAuthors()
+        {
+            List<string[]> specificAuthors = new List<string[]>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            { 
+                con.Open();
+                using (SqlCommand command = new SqlCommand("Select first, last from TestSample", con))
+                {
+                    command.CommandTimeout = 500;
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string[] fields = new string[reader.FieldCount];
+                            for (int i = 0; i < fields.Length; i++)
+                            {
+                                fields[i] = reader[i].ToString();
+                            }
+                            specificAuthors.Add(fields);
+                        }
+                    }
+                }
+            }
+            return specificAuthors;
         }
 
     }

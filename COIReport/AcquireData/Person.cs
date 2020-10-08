@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Linq;
 
 namespace AcquireData
 {
@@ -99,7 +100,7 @@ namespace AcquireData
             state = BlankCheck(state, newAuthor.state);
             Involvement = BlankCheck(Involvement, newAuthor.Involvement);
             otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
-            companiesNumbered = BlankCheck(companiesNumbered, newAuthor.companiesNumbered);
+            companiesNumbered = NumberCompanyCheck(companiesNumbered, newAuthor.companiesNumbered);
             otherCompanies = OtherCompanyCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
@@ -151,5 +152,28 @@ namespace AcquireData
                 return currentList;
             }
         }
+
+       /// <summary>
+       /// This method is used to merge incoming lists of companies so that some aren't overwritten.
+       /// This is similar to the OtherCompanyCheck method but is not the same due to the fact that 
+       /// newCompanyList can have multiple numbers in it.
+       /// </summary>
+       /// <param name="currentList">the current list of numbered companies</param>
+       /// <param name="newCompanyList">a new list of numbered companies</param>
+       /// <returns>a company list that has all the numbers of the old list plus all of the new companies
+       ///  in the newCompanyList</returns>
+       private string NumberCompanyCheck(string currentList, string newCompanyList)
+        {
+            HashSet<string> current = currentList.Split(',').ToHashSet();
+            string[] newlist = newCompanyList.Split(',');
+            for(int i = 0; i < newlist.Length; i++)
+            {
+                current.Add(newlist[i]);
+            }
+            string output = string.Join(',', current.ToArray());
+            if(output.Length > 0 && output[0].Equals(',')) { output = output.Substring(1, output.Length - 1); }
+            return output;
+        }
+
     }
 }
