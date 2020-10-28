@@ -292,13 +292,18 @@ namespace AcquireData
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
 
-            connectionString = new SqlConnectionStringBuilder()
-            {
-                DataSource = "cs3500.eng.utah.edu, 14330",
-                InitialCatalog = SelectedSecrets["DataBaseName"],
-                UserID = SelectedSecrets["SQLUsername"],
-                Password = SelectedSecrets["SQLPassword"]
-            }.ConnectionString;
+            connectionString = "data source=mssql.chpc.utah.edu;" +
+                "Initial Catalog= COI_Report_DB;" +
+                "Integrated Security=SSPI;";
+
+            //connectionString = new SqlConnectionStringBuilder()
+            //{
+            //    DataSource = "mssql.chpc.utah.edu",
+            //    //   InitialCatalog = SelectedSecrets["DataBaseName"],
+            //    //   UserID = SelectedSecrets["SQLUsername"],
+            //    //  Password = SelectedSecrets["SQLPassword"]
+                
+            //}.ConnectionString;
 
         }
         /// <summary>
