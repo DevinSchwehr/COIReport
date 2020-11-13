@@ -157,7 +157,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"\\tsclient\C\Users\devin\OneDrive\Documents\COI Report\SearchOutputs\PaymentOutput4";
+            string filePath = @"D:\Users\u1205752\Documents\COI\SearchOutputsPaymentOutput5.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
@@ -212,7 +212,14 @@ namespace RedcapApiDemo
                 //If there is an OPD entry that has a company that is not in the list of companies the author reported,
                 //Then there is a discrepancy that must be shown to the user.
 
-                if(!(findCompany(OPDEntry[25], authorCompanies)))
+                //These checks are here since in each of the different types of OPDf
+                string company;
+                if(OPDEntry[OPDEntry.Length-1].Equals("General")) { company = OPDEntry[25]; }
+                else if(OPDEntry[OPDEntry.Length-1].Equals("Research")) { company = OPDEntry[125]; }
+                else { company = OPDEntry[21]; }
+
+
+                if(!(findCompany(company, authorCompanies)))
                 {
 
                     //string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Undisclosed","\""+ OPDEntry[25] + "\"", OPDEntry[26],OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], "\"" + OPDEntry[34] + "\"", OPDEntry[33], OPDEntry[30] };
@@ -232,11 +239,14 @@ namespace RedcapApiDemo
             }
             OutputToCSV(outputs);
             //This if statement is to catch if there were not 'hits', but the author still had companies reported.
-            if(companyHits.Count == 0 && !(authorCompanies[0].Equals("")))
+            if(companyHits.Count == 0 && authorCompanies.Count > 0)
             {
                 foreach(string company in authorCompanies)
                 {
-                    Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
+                    if(!(company.Equals("")) && !(company.Equals("Other")))
+                    {
+                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
+                    }
                 }
             }
             //This else statement is for finding the remaining companies that were hits
@@ -282,7 +292,7 @@ namespace RedcapApiDemo
                 List<string> entry = new List<string>(OPDEntry);
                 //There can be multiple authors on one line, but the Physician ID is always right before the first name.
                 int firstName = entry.IndexOf(author.first.ToUpper());
-                string[] output = { author.authorshipNumber.ToString(), OPDEntry[firstName-1], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[125] + "\"", OPDEntry[126], OPDEntry[169], OPDEntry[157], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[158], OPDEntry[156] };
+                string[] output = { author.authorshipNumber.ToString(), OPDEntry[firstName-1], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[125] + "\"", OPDEntry[126], OPDEntry[169], OPDEntry[158], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[159], OPDEntry[157] };
                 return output;
             }
            // if(OPDEntry[OPDEntry.Length-1].Equals("Ownership"))

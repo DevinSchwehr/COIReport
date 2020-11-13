@@ -189,15 +189,15 @@ namespace AcquireData
         /// <returns>if the company is typoed, it returns the fixed company. Else, it returns the company as is.</returns>
         private static string TypoCheck(string company)
         {
-            if(company.Equals("Cambrium")) { return "Cambium"; }
-            if(company.Equals("Nidex")) { return "Nidek"; }
-            if(company.Equals("Aldevra")) { return "Aldeyra"; }
-            if(company.Equals("ophthea")) { return "opthea"; }
-            if(company.Equals("Abbot")) { return "Abbott";   }
-            if(company.Equals("Abbot Medical Optics aka AMO")) { return "Abbott"; }
-            if(company.Equals("Dutch Ophthalmic Research Center (DORC)")) { return "Dutch Ophthalmic"; }
-            if(company.Equals("Notal Vision")) { return "NotalVision"; }
-            if(company.Equals("Bausch and Lomb")) { return "Bausch"; }
+            if(company.Contains("Cambrium")) { return "Cambium"; }
+            if(company.Contains("Nidex")) { return "Nidek"; }
+            if(company.Contains("Aldevra")) { return "Aldeyra"; }
+            if(company.Contains("ophthea")) { return "opthea"; }
+            if(company.Contains("Abbot")) { return "Abbott";   }
+            if(company.Contains("Abbot Medical Optics aka AMO")) { return "Abbott"; }
+            if(company.Contains("Dutch Ophthalmic Research Center (DORC)")) { return "Dutch Ophthalmic"; }
+            if(company.Contains("Notal Vision")) { return "NotalVision"; }
+            if(company.Contains("Bausch and Lomb")) { return "Bausch"; }
             return company;
         }
 
@@ -427,14 +427,25 @@ namespace AcquireData
                     //Now we do a check to make sure that they are in the same city and state as the author.
                     foreach (string[] row in OPDOutputs)
                     {
-                        if (row[12].Equals(city) && row[13].Equals(state)) { sameCityState.Add(row); }
+                        int cityNum;
+                        int stateNum;
+                        //Each OPD table has it's own index for city and state
+                        if(table.Contains("GNRL")) { cityNum = 12; stateNum = 13; }
+                        else if(table.Contains("RSRCH")) { cityNum = 13; stateNum = 14; }
+                        else { cityNum = 8; stateNum = 9; }
+                        
+                        if (row[cityNum].Equals(city) && row[stateNum].Equals(state)) { sameCityState.Add(row); }
                     }
                     //Now that we can ascertain the accuracy of the author down to what we hope is one person, we will then make another 
                     //Search using the Physician ID of the author
                     if (sameCityState.Count > 0)
                     {
+                        int idIndex;
+                        if (table.Contains("GNRL")) { idIndex = 5; }
+                        else if (table.Contains("RSRCH")) { idIndex = 6; }
+                        else { idIndex = 1; }
                         con.Open();
-                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][5]}'", con))
+                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][idIndex]}'", con))
                         {
                             command.CommandTimeout = 5000;
                             using (SqlDataReader reader = command.ExecuteReader())
@@ -446,11 +457,12 @@ namespace AcquireData
                                     {
                                         fields[i] = reader[i].ToString();
                                     }
-                                    if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
-                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
-                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
+                                    string date = "";
+                                    if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; date = fields[31]; }
+                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; date = fields[158]; }
+                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; date = fields[28]; }
                                     //Now we check to make sure the date is within the current timeframe.
-                                    DateTime OpdDate = DateTime.Parse(fields[31]);
+                                    DateTime OpdDate = DateTime.Parse(date);
                                     if (WithinTimeFrame(RedcapDate, OpdDate))
                                     {
                                         matchingID.Add(fields);
@@ -493,6 +505,11 @@ namespace AcquireData
                 if(opdDate.Month.CompareTo(RedcapDate.Month) < 0)
                 {
                     return false; 
+                }
+                //However, if three years back and in the same month, check to make sure it is not too early in the month.
+                else if((opdDate.Month.CompareTo(RedcapDate.Month) ==0) && (opdDate.Day.CompareTo(RedcapDate.Day) < 0))
+                {
+                    return false;
                 }
             }
             //If it hasn't returned false, then it is in the period. return true. 
