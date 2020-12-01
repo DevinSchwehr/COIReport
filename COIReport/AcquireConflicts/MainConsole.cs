@@ -32,7 +32,7 @@ namespace RedcapApiDemo
             
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 0; i < authors.Count; i++)
+            for (int i = 55; i < authors.Count; i++)
             {
                 searchResults = new List<String[]>();
 
@@ -157,7 +157,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"D:\Users\u1205752\Documents\COI\SearchOutputsPaymentOutput5.csv";
+            string filePath = @"D:\Users\u1205752\Documents\COI\CarlAwh30.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
@@ -215,7 +215,19 @@ namespace RedcapApiDemo
                 //These checks are here since in each of the different types of OPDf
                 string company;
                 if(OPDEntry[OPDEntry.Length-1].Equals("General")) { company = OPDEntry[25]; }
-                else if(OPDEntry[OPDEntry.Length-1].Equals("Research")) { company = OPDEntry[125]; }
+                else if(OPDEntry[OPDEntry.Length-1].Equals("Research"))
+                {
+                    //if (!(OPDEntry[157].Contains("No") || OPDEntry[157].Contains("Yes")))
+                    //{
+                    //    company = OPDEntry[126];
+                    //}
+                    //else
+                    //{
+                    //    company = OPDEntry[126];
+                    //}
+                    company = OPDEntry[126];
+
+                }
                 else { company = OPDEntry[21]; }
 
 
@@ -243,7 +255,7 @@ namespace RedcapApiDemo
             {
                 foreach(string company in authorCompanies)
                 {
-                    if(!(company.Equals("")) && !(company.Equals("Other")))
+                    if(!(company.Equals("")) && !(company.Equals("Other")) && !(company.Equals(" ")))
                     {
                         Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
                     }
@@ -262,7 +274,7 @@ namespace RedcapApiDemo
                 {
                     foreach(string company in authorCompanies)
                     {
-                        if (!company.Equals("Other"))
+                        if (!company.Equals("Other") && !(company.Equals("")))
                         {
                         Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
                         }
@@ -289,16 +301,23 @@ namespace RedcapApiDemo
             }
             else if(OPDEntry[OPDEntry.Length-1].Equals("Research"))
             {
-                List<string> entry = new List<string>(OPDEntry);
-                //There can be multiple authors on one line, but the Physician ID is always right before the first name.
-                int firstName = entry.IndexOf(author.first.ToUpper());
-                string[] output = { author.authorshipNumber.ToString(), OPDEntry[firstName-1], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[125] + "\"", OPDEntry[126], OPDEntry[169], OPDEntry[158], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[159], OPDEntry[157] };
-                return output;
+                
+                //Due to the OPD Research file having a format change from 2014 onward, we have two different cases depending on what element 157 contains. If it's a date, then it's 2015+, else it's from 2014 to 2013
+                if(!(OPDEntry[157].Contains("No") || OPDEntry[157].Contains("Yes")))
+                {
+                    string[] output = { author.authorshipNumber.ToString(), OPDEntry[6], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[126] + "\"", OPDEntry[127], OPDEntry[170], OPDEntry[158], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[159], OPDEntry[157] };
+                    return output;
+                }
+                else
+                {
+                    string[] output = { author.authorshipNumber.ToString(), OPDEntry[6], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[126] + "\"", OPDEntry[127], OPDEntry[160], OPDEntry[148], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[149], OPDEntry[147] };
+                    return output;
+                }
             }
            // if(OPDEntry[OPDEntry.Length-1].Equals("Ownership"))
             else
             {
-                string[] output = { author.authorshipNumber.ToString(), OPDEntry[1], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[21] + "\"", OPDEntry[22], OPDEntry[16], OPDEntry[28], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[20], OPDEntry[19] };
+                string[] output = { author.authorshipNumber.ToString(), OPDEntry[1], author.last, author.first, position, author.articleNumber, author.journal, disclosure, "\"" + OPDEntry[21] + "\"", OPDEntry[22], OPDEntry[16], OPDEntry[17], OPDEntry[OPDEntry.Length - 1], "N/A", OPDEntry[20], OPDEntry[19] };
                 return output;
             }
 

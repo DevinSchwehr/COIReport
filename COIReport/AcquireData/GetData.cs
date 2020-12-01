@@ -459,13 +459,32 @@ namespace AcquireData
                                     }
                                     string date = "";
                                     if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; date = fields[31]; }
-                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; date = fields[158]; }
-                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; date = fields[28]; }
-                                    //Now we check to make sure the date is within the current timeframe.
-                                    DateTime OpdDate = DateTime.Parse(date);
-                                    if (WithinTimeFrame(RedcapDate, OpdDate))
+                                    else if (table.Contains("RSRCH")) 
                                     {
-                                        matchingID.Add(fields);
+                                        if (!(fields[157].Contains("No") || fields[157].Contains("Yes")))
+                                        {
+                                            date = fields[158];
+                                        }
+                                        else
+                                        {
+                                            date = fields[148];
+                                        }
+                                        fields[fields.Length - 1] = "Research";
+                                    }
+                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; date = fields[17]; }
+                                    
+                                    //Now we check to make sure the date is within the current timeframe.
+                                    if(table.Contains("OWNRSHP") && (RedcapDate.Year - int.Parse(date) <=4 ))
+                                    {
+                                        matchingID.Add(fields); 
+                                    }
+                                    else
+                                    {
+                                        DateTime OpdDate = DateTime.Parse(date);
+                                        if (WithinTimeFrame(RedcapDate, OpdDate))
+                                        {
+                                            matchingID.Add(fields);
+                                        }
                                     }
                                 }
                             }
