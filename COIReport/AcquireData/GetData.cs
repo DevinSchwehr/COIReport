@@ -280,6 +280,7 @@ namespace AcquireData
     public static class GetOPDAndSQLData
     {
         public static readonly string connectionString;
+        public static string PhysicianID = null;
         /// <summary>
         /// this is used to get the connection string with the OPD that we will use
         /// for future commands.
@@ -401,65 +402,76 @@ namespace AcquireData
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    con.Open();
-                    //This command will query the database for any author with the same first and last name
-                    using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
+                    //We only want to do the search to find the Physician ID if the Physician ID is currently null.
+                    if(PhysicianID == null)
                     {
-                        command.CommandTimeout = 5000;
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                String[] fields = new string[reader.FieldCount+1];
-                                for (int i = 0; i < fields.Length-1; i++)
-                                {
-                                    fields[i] = reader[i].ToString();
-                                }
-                                if(table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
-                                else if(table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
-                                else if(table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
-                                //We don't check the timeframe here because it will get sorted later.
-                                OPDOutputs.Add(fields);
-                            }
-                        }
-                    }
-                    con.Close();
-                    //Now we do a check to make sure that they are in the same city and state as the author.
-                    foreach (string[] row in OPDOutputs)
-                    {
-                        int cityNum;
-                        int stateNum;
-                        //Each OPD table has it's own index for city and state
-                        if(table.Contains("GNRL")) { cityNum = 12; stateNum = 13; }
-                        else if(table.Contains("RSRCH")) { cityNum = 13; stateNum = 14; }
-                        else { cityNum = 8; stateNum = 9; }
-                        
-                        if (row[cityNum].Equals(city) && row[stateNum].Equals(state)) { sameCityState.Add(row); }
-                    }
-                    //Now that we can ascertain the accuracy of the author down to what we hope is one person, we will then make another 
-                    //Search using the Physician ID of the author
-                    if (sameCityState.Count > 0)
-                    {
-                        int idIndex;
-                        if (table.Contains("GNRL")) { idIndex = 5; }
-                        else if (table.Contains("RSRCH")) { idIndex = 6; }
-                        else { idIndex = 1; }
                         con.Open();
-                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{sameCityState[0][idIndex]}'", con))
+                        //This command will query the database for any author with the same first and last name
+                        using (SqlCommand command = new SqlCommand($"select * from {table} where upper(Physician_First_Name) = upper('{first}') and upper(Physician_Last_Name) = upper('{last}')", con))
                         {
                             command.CommandTimeout = 5000;
                             using (SqlDataReader reader = command.ExecuteReader())
                             {
                                 while (reader.Read())
                                 {
-                                    String[] fields = new string[reader.FieldCount+1];
-                                    for (int i = 0; i < fields.Length-1; i++)
+                                    String[] fields = new string[reader.FieldCount + 1];
+                                    for (int i = 0; i < fields.Length - 1; i++)
+                                    {
+                                        fields[i] = reader[i].ToString();
+                                    }
+                                    if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; }
+                                    else if (table.Contains("RSRCH")) { fields[fields.Length - 1] = "Research"; }
+                                    else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; }
+                                    //We don't check the timeframe here because it will get sorted later.
+                                    OPDOutputs.Add(fields);
+                                }
+                            }
+                        }
+                        con.Close();
+                        //Now we do a check to make sure that they are in the same city and state as the author.
+                        foreach (string[] row in OPDOutputs)
+                        {
+                            int cityNum;
+                            int stateNum;
+                            //Each OPD table has it's own index for city and state
+                            if (table.Contains("GNRL")) { cityNum = 12; stateNum = 13; }
+                            else if (table.Contains("RSRCH")) { cityNum = 13; stateNum = 14; }
+                            else { cityNum = 8; stateNum = 9; }
+
+                            if (row[cityNum].Equals(city) && row[stateNum].Equals(state)) { sameCityState.Add(row); }
+                        }
+                        //Now that we can ascertain the accuracy of the author down to what we hope is one person, we will then make another 
+                        //Search using the Physician ID of the author
+                        if (sameCityState.Count > 0)
+                        {
+                            int idIndex;
+                            if (table.Contains("GNRL")) { idIndex = 5; }
+                            else if (table.Contains("RSRCH")) { idIndex = 6; }
+                            else { idIndex = 1; }
+                            PhysicianID = sameCityState[0][idIndex];
+                        }
+
+                    }
+
+                    //We only do the ID search if the Physician ID is not null.
+                    if (PhysicianID != null)
+                    {
+                        con.Open();
+                        using (SqlCommand command = new SqlCommand($"select * from {table} where Physician_Profile_ID = '{PhysicianID}'", con))
+                        {
+                            command.CommandTimeout = 5000;
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    String[] fields = new string[reader.FieldCount + 1];
+                                    for (int i = 0; i < fields.Length - 1; i++)
                                     {
                                         fields[i] = reader[i].ToString();
                                     }
                                     string date = "";
                                     if (table.Contains("GNRL")) { fields[fields.Length - 1] = "General"; date = fields[31]; }
-                                    else if (table.Contains("RSRCH")) 
+                                    else if (table.Contains("RSRCH"))
                                     {
                                         if (!(fields[157].Contains("No") || fields[157].Contains("Yes")))
                                         {
@@ -472,11 +484,11 @@ namespace AcquireData
                                         fields[fields.Length - 1] = "Research";
                                     }
                                     else if (table.Contains("OWNRSHP")) { fields[fields.Length - 1] = "Ownership"; date = fields[17]; }
-                                    
+
                                     //Now we check to make sure the date is within the current timeframe.
-                                    if(table.Contains("OWNRSHP") && (RedcapDate.Year - int.Parse(date) <=4 ))
+                                    if (table.Contains("OWNRSHP") && (RedcapDate.Year - int.Parse(date) <= 4))
                                     {
-                                        matchingID.Add(fields); 
+                                        matchingID.Add(fields);
                                     }
                                     else
                                     {
@@ -490,6 +502,7 @@ namespace AcquireData
                             }
                         }
                         con.Close();
+
                     }
 
                 }

@@ -32,7 +32,7 @@ namespace RedcapApiDemo
             
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 55; i < authors.Count; i++)
+            for (int i = 0; i < authors.Count; i++)
             {
                 searchResults = new List<String[]>();
 
@@ -118,6 +118,8 @@ namespace RedcapApiDemo
                 {
                     Console.WriteLine($"Could not find {author.first}, {author.last} at location {author.city}, {author.state}.");
                 }
+                //We reset the PhysicianID to null here so that the next author has to do the process at least once.
+                GetOPDAndSQLData.PhysicianID = null;
             }
         }
 
@@ -157,7 +159,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"D:\Users\u1205752\Documents\COI\CarlAwh30.csv";
+            string filePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckTest.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
@@ -230,23 +232,31 @@ namespace RedcapApiDemo
                 }
                 else { company = OPDEntry[21]; }
 
-
-                if(!(findCompany(company, authorCompanies)))
+                //This check is because Bausch and Lomb acquired Valeant so when comparing if the company is Bausch or Valeant and the author has either of these 
+                //companies reported, we admit it as reported.
+                bool BauschCheck = false;
+                if(company.Contains("Bausch") && authorCompanies.Contains("Valeant") || company.Contains("Valeant") && authorCompanies.Contains("Bausch")) 
+                { 
+                    BauschCheck = true;
+                }
+               
+                //If the company is found or satisfies the BauschCheck above, put it in as reported.
+                if(findCompany(company, authorCompanies) || BauschCheck)
                 {
 
                     //string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Undisclosed","\""+ OPDEntry[25] + "\"", OPDEntry[26],OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], "\"" + OPDEntry[34] + "\"", OPDEntry[33], OPDEntry[30] };
-                    string[] currentLine = FormCSVLine(author, OPDEntry, "Undisclosed", position);
+                    string[] currentLine = FormCSVLine(author, OPDEntry, "Reported", position);
                     outputs.Add(currentLine);                   
+                    companyHits.Add(companyHitString);
                     // Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
                 {
                     // string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Reported", "\"" + OPDEntry[25] + "\"", OPDEntry[26], OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], "\"" +  OPDEntry[34] + "\"", OPDEntry[33], OPDEntry[30] };
-                    string[] currentLine = FormCSVLine(author, OPDEntry, "Reported", position);
+                    string[] currentLine = FormCSVLine(author, OPDEntry, "Undisclosed", position);
                     outputs.Add(currentLine);
                    // Console.WriteLine($"SUCCESSFUL MATCH: Author reported company {OPDEntry[25]} in their list of companies.");
-                    companyHits.Add(companyHitString);
                 }
             }
             OutputToCSV(outputs);
@@ -257,7 +267,7 @@ namespace RedcapApiDemo
                 {
                     if(!(company.Equals("")) && !(company.Equals("Other")) && !(company.Equals(" ")))
                     {
-                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
+                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
                     }
                 }
             }
@@ -272,11 +282,15 @@ namespace RedcapApiDemo
                 //If there are any companies left, then there are companies the author reported that were not found within the OPD
                 if(authorCompanies.Count > 0)
                 {
+                    //These checks are for the Bausch/Valeant Check detailed above. This is so that the output doesn't say 
+                    if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
+                    if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
+
                     foreach(string company in authorCompanies)
                     {
                         if (!company.Equals("Other") && !(company.Equals("")))
                         {
-                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was not found within the OPD.");
+                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
                         }
                     }
                 }
