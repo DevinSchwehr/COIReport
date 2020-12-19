@@ -159,7 +159,7 @@ namespace RedcapApiDemo
         /// <param name="searchResults">the result of searching the OPD </param>
         private static void OutputToCSV(List<String[]> searchResults)
         {
-            string filePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckTest.csv";
+            string filePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckTest3.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
@@ -244,19 +244,15 @@ namespace RedcapApiDemo
                 if(findCompany(company, authorCompanies) || BauschCheck)
                 {
 
-                    //string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Undisclosed","\""+ OPDEntry[25] + "\"", OPDEntry[26],OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], "\"" + OPDEntry[34] + "\"", OPDEntry[33], OPDEntry[30] };
                     string[] currentLine = FormCSVLine(author, OPDEntry, "Reported", position);
                     outputs.Add(currentLine);                   
                     companyHits.Add(companyHitString);
-                    // Console.WriteLine("DISCREPANCY: Company not reported by author. Company is: " + OPDEntry[25] + ", Date of payment: " + OPDEntry[31] + " Type of Payment: " + OPDEntry[34] + "Payment Amount: " + OPDEntry[30] + " "+ GetOpdData.FindAuthorPosition(author.first, author.last)); ;
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
                 {
-                    // string[] currentLine = { author.authorshipNumber.ToString(), OPDEntry[5], author.last, author.first, position, author.articleNumber, author.journal, "Reported", "\"" + OPDEntry[25] + "\"", OPDEntry[26], OPDEntry[45], OPDEntry[31], OPDEntry[OPDEntry.Length - 1], "\"" +  OPDEntry[34] + "\"", OPDEntry[33], OPDEntry[30] };
                     string[] currentLine = FormCSVLine(author, OPDEntry, "Undisclosed", position);
                     outputs.Add(currentLine);
-                   // Console.WriteLine($"SUCCESSFUL MATCH: Author reported company {OPDEntry[25]} in their list of companies.");
                 }
             }
             OutputToCSV(outputs);
