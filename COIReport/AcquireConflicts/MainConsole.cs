@@ -15,6 +15,9 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckTest3.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckAuthorOutput.csv";
+
         static void Main(string[] args)
         {
             Console.WriteLine("Hello! Welcome to the OPD searcher.");
@@ -116,7 +119,9 @@ namespace RedcapApiDemo
                 if (searchResults.Count > 0) { AnalyzeOPDList(searchResults, author); }
                 else
                 {
-                    Console.WriteLine($"Could not find {author.first}, {author.last} at location {author.city}, {author.state}.");
+                    // Console.WriteLine($"Could not find {author.first}, {author.last} at location {author.city}, {author.state}.");
+                    string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Not Found", author.city, author.state };
+                    OutputToCSV(row, authoroutputFilePath);
                 }
                 //We reset the PhysicianID to null here so that the next author has to do the process at least once.
                 GetOPDAndSQLData.PhysicianID = null;
@@ -157,18 +162,18 @@ namespace RedcapApiDemo
         /// we were finding the right author.
         /// </summary>
         /// <param name="searchResults">the result of searching the OPD </param>
-        private static void OutputToCSV(List<String[]> searchResults)
+        private static void OutputToCSV(string[] searchResults, string filePath)
         {
-            string filePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheckTest3.csv";
             if (!File.Exists(filePath))
             {
                 File.Create(filePath).Close();
             }
             string delimiter = ",";
 
+            
             using (System.IO.TextWriter writer = File.AppendText(filePath))
             {
-                for (int index = 0; index < searchResults.Count; index++)
+                for (int index = 0; index < searchResults.Length; index++)
                 {
                     writer.WriteLine(string.Join(delimiter, searchResults[index]));
                 }
@@ -194,8 +199,6 @@ namespace RedcapApiDemo
             string[] authorNumberedCompanies = author.companiesNumbered.Split(',');
             //we find the author's position here to use later.
             string position = GetOPDAndSQLData.FindAuthorPosition(author.first, author.last);
-            //This List will be used to output the results to a csv
-            List<String[]> outputs = new List<String[]>();
             //This list is to do a reverse comparison from author reported companies to the OPD to see if any companies did not 
             //Report a payment where the author did
             HashSet<String> companyHits = new HashSet<string>();
@@ -245,32 +248,34 @@ namespace RedcapApiDemo
                 {
 
                     string[] currentLine = FormCSVLine(author, OPDEntry, "Reported", position);
-                    outputs.Add(currentLine);                   
+                    OutputToCSV(currentLine, companyOutputFilePath);
                     companyHits.Add(companyHitString);
                 }
                 //If the above statement is false, then we can know that there was a match, and there was no discrepancy
                 else
                 {
                     string[] currentLine = FormCSVLine(author, OPDEntry, "Undisclosed", position);
-                    outputs.Add(currentLine);
+                    OutputToCSV(currentLine, companyOutputFilePath);
                 }
             }
-            OutputToCSV(outputs);
             //This if statement is to catch if there were not 'hits', but the author still had companies reported.
-            if(companyHits.Count == 0 && authorCompanies.Count > 0)
-            {
-                foreach(string company in authorCompanies)
-                {
-                    if(!(company.Equals("")) && !(company.Equals("Other")) && !(company.Equals(" ")))
-                    {
-                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
-                    }
-                }
-            }
+            //if(companyHits.Count == 0 && authorCompanies.Count > 0)
+            //{
+            //    foreach(string company in authorCompanies)
+            //    {
+            //        if(!(company.Equals("")) && !(company.Equals("Other")) && !(company.Equals(" ")))
+            //        {
+            //            Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
+            //        }
+            //    }
+            //}
             //This else statement is for finding the remaining companies that were hits
-            else if(companyHits.Count != 0)
-            {
-                //As we find hits, we remove them from the company list.
+           // else if(companyHits.Count != 0)
+           // {
+ 
+            
+            
+            //As we find hits, we remove them from the company list.
                 foreach(string hit in companyHits)
                 {
                     authorCompanies.Remove(hit);
@@ -282,15 +287,18 @@ namespace RedcapApiDemo
                     if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
                     if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
 
-                    foreach(string company in authorCompanies)
-                    {
-                        if (!company.Equals("Other") && !(company.Equals("")))
-                        {
-                        Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
-                        }
-                    }
+                //foreach(string company in authorCompanies)
+                //{
+                //    if (!company.Equals("Other") && !(company.Equals("")))
+                //    {
+                //    Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
+                //    }
+                //}
+
+                    string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Found", author.city, author.state, authorCompanies.ToArray().ToString() };
+                    OutputToCSV(row, authoroutputFilePath);
                 }
-            }
+           // }
         }
 
         //private static string PaymentSubtype(string[] OPDEntry, Person author)
