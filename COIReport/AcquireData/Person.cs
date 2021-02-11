@@ -16,8 +16,8 @@ namespace AcquireData
         private string otherDegree { get; set; }
         private string USLocation { get; set; }
         private string institution { get; set; }
-        public string city { get; set; }
-        public string state { get; set; }
+        public string cities { get; set; }
+        public string states { get; set; }
         private string  Involvement { get; set; }
         private string otherInvolvement { get; set; }
         public string companiesNumbered { get; set; }
@@ -65,8 +65,8 @@ namespace AcquireData
             this.otherDegree = freetextdegreeother;
             this.USLocation = uslocation;
             this.institution = institution;
-            this.city = city.ToUpper();
-            this.state = state;
+            this.cities = city.ToUpper();
+            this.states = state;
             this.Involvement = type3;
             this.otherInvolvement = freetexttypeother3;
             this.companiesNumbered = entity3;
@@ -96,12 +96,13 @@ namespace AcquireData
             otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
             USLocation = BlankCheck(USLocation, newAuthor.USLocation);
             institution = BlankCheck(institution, newAuthor.institution);
-            city = BlankCheck(city, newAuthor.city);
-            state = BlankCheck(state, newAuthor.state);
+            cities = OtherEntityCheck(cities, newAuthor.cities);
+            if(!(newAuthor.states.Equals(""))) { states += newAuthor.states + ','; }
+           // states = NumberEntityCheck(states, newAuthor.states);
             Involvement = BlankCheck(Involvement, newAuthor.Involvement);
             otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
-            companiesNumbered = NumberCompanyCheck(companiesNumbered, newAuthor.companiesNumbered);
-            otherCompanies = OtherCompanyCheck(otherCompanies, newAuthor.otherCompanies);
+            companiesNumbered = NumberEntityCheck(companiesNumbered, newAuthor.companiesNumbered);
+            otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
             receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);
@@ -132,14 +133,14 @@ namespace AcquireData
         }
 
         /// <summary>
-        /// This is used for getting all of the 'other' companies. We don't use BlankCheck here
+        /// This is used for getting all of the 'other' companies or cities. We don't use BlankCheck here
         /// because there can be multiple companies, all on their own individual row. So we add them
         /// to the string as we find them instead of doing a BlankCheck.
         /// </summary>
         /// <param name="currentList">the current list of other companies</param>
         /// <param name="newCompany">the company that is being checked to be added in or not</param>
         /// <returns>the string either with the new company added, or the string as it was.</returns>
-        private string OtherCompanyCheck(string currentList, string newCompany)
+        private string OtherEntityCheck(string currentList, string newCompany)
         {
             if (currentList.Contains(newCompany))
             {
@@ -162,7 +163,7 @@ namespace AcquireData
        /// <param name="newCompanyList">a new list of numbered companies</param>
        /// <returns>a company list that has all the numbers of the old list plus all of the new companies
        ///  in the newCompanyList</returns>
-       private string NumberCompanyCheck(string currentList, string newCompanyList)
+       private string NumberEntityCheck(string currentList, string newCompanyList)
         {
             HashSet<string> current = currentList.Split(',').ToHashSet();
             string[] newlist = newCompanyList.Split(',');
