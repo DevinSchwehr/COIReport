@@ -15,8 +15,8 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
-        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheck8.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheck8Author.csv";
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\OphthReal2.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\OphthRealTest2.csv";
 
         static void Main(string[] args)
         {

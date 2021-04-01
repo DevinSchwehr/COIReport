@@ -39,8 +39,8 @@ namespace AcquireData
             builder.AddUserSecrets<GetData>();
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
-            token = SelectedSecrets["APIToken"];
-            reportID = SelectedSecrets["DevinReportID"];
+            token = SelectedSecrets["OphthRealAPIToken"];
+            reportID = SelectedSecrets["OphthRealDevinReportID"];
             apiURL = SelectedSecrets["APIURL"];
 
             var redcap_api = new RedcapApi(apiURL);
@@ -233,7 +233,7 @@ namespace AcquireData
                 case " Michigan ": return "MI";
                 case " Minnesota ": return "MN";
                 case " Mississippi ": return "MS";
-                case " Missouri ": return "MS";
+                case " Missouri ": return "MO";
                 case " Montana ": return "MT";
                 case " Nebraska ": return "NE";
                 case " Nevada ": return "NV";
@@ -504,7 +504,7 @@ namespace AcquireData
                         {
                             if(!(authorCities[index].Equals("")) && !(authorStates[index].Equals("")))
                             {
-                                if (row[cityNum].Equals(authorCities[index]) && row[stateNum].Equals(GetData.stateDictionary[int.Parse(authorStates[index])])) { sameCityState.Add(row); }
+                                if (row[cityNum].ToUpper().Equals(authorCities[index]) && row[stateNum].ToUpper().Equals(GetData.stateDictionary[int.Parse(authorStates[index])])) { sameCityState.Add(row); }
                             }
                         }
                     }
@@ -575,7 +575,7 @@ namespace AcquireData
             using (SqlConnection con = new SqlConnection(connectionString))
             {
                 con.Open();
-                using (SqlCommand command = new SqlCommand($"select position from OphthAuthorPositions2019 where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
+                using (SqlCommand command = new SqlCommand($"select position from ophth20172018listperauthorwithposition where UPPER(last) = upper('{last}') and upper(first) = upper('{first}')", con))
                 {
                     command.CommandTimeout = 1000;
                     using (SqlDataReader reader = command.ExecuteReader())
