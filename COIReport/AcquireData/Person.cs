@@ -31,6 +31,7 @@ namespace AcquireData
         private string pubmonth { get; set; }
 
         private string articleTitle { get; set; }
+        public string position { get; set; }
 
 
         /// <summary>
@@ -53,9 +54,9 @@ namespace AcquireData
         /// <param name="articlenumber">the article the author is associated with</param>
         /// <param name="journal">the journal the article is in</param>
         /// <param name="receivedate">the date the journal was received</param>
-        public Person(string authorshipnumber, string first, string middle, string last, string clinicaldegree, string freetextdegreeother,
-            string uslocation, string institution, string city, string state, string type3, string freetexttypeother3, string entity3,
-            string freetextentityother3, string articlenumber, string journal, string receiveddate, string volume, string issue, string pubyear, string pubmonth, string title)
+        public Person(string authorshipnumber, string articlenumber, string last, string first, string uslocation, string clinicaldegree, string city, string state, string any_disclosures,
+            string entity, string freetextentityother3, string journal, string volume, string issue, string startpage, string pubyear, string pubmonth, string accepteddate, string title,
+            string middle, string position, string freetextdegreeother)
         {
             this.authorshipNumber = int.Parse(authorshipnumber);
             this.first = first.ToUpper();
@@ -67,18 +68,19 @@ namespace AcquireData
             this.institution = institution;
             this.cities = city.ToUpper();
             this.states = state;
-            this.Involvement = type3;
-            this.otherInvolvement = freetexttypeother3;
-            this.companiesNumbered = entity3;
+            //this.Involvement = type3;
+            //this.otherInvolvement = freetexttypeother3;
+            this.companiesNumbered = entity;
             this.otherCompanies = freetextentityother3;
             this.articleNumber = articlenumber;
             this.journal = journal;
-            this.receiveddate = receiveddate;
+            this.receiveddate = accepteddate;
             this.volume = volume;
             this.issue = issue;
             this.pubyear = pubyear;
             this.pubmonth = pubmonth;
             this.articleTitle = title;
+            this.position = position;
         }
 
         /// <summary>
@@ -99,8 +101,8 @@ namespace AcquireData
             cities = OtherEntityCheck(cities, newAuthor.cities);
             if(!(newAuthor.states.Equals(""))) { states += newAuthor.states + ','; }
            // states = NumberEntityCheck(states, newAuthor.states);
-            Involvement = BlankCheck(Involvement, newAuthor.Involvement);
-            otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
+           // Involvement = BlankCheck(Involvement, newAuthor.Involvement);
+           // otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
             companiesNumbered = NumberEntityCheck(companiesNumbered, newAuthor.companiesNumbered);
             otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);

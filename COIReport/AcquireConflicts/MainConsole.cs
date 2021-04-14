@@ -15,8 +15,8 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
-        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheck8.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\DisclosureCheck8Author.csv";
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMAReal.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMARealAuthor.csv";
 
         static void Main(string[] args)
         {
@@ -110,7 +110,7 @@ namespace RedcapApiDemo
                 else
                 {
                     // Console.WriteLine($"Could not find {author.first}, {author.last} at location {author.city}, {author.state}.");
-                    string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Not Found", author.cities.Replace(',',';'), author.states.Replace(',', ';')," ", GetOPDAndSQLData.FindAuthorPosition(author.first, author.last), author.articleNumber, author.journal, author.receiveddate, "N/A" };
+                    string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Not Found", author.cities.Replace(',',';'), author.states.Replace(',', ';')," ", author.position, author.articleNumber, author.journal, author.receiveddate, "N/A" };
                     OutputToCSV(row, authoroutputFilePath);
                 }
                 //We reset the PhysicianID to null here so that the next author has to do the process at least once.
@@ -190,7 +190,7 @@ namespace RedcapApiDemo
             List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
             string[] authorNumberedCompanies = author.companiesNumbered.Split(',');
             //we find the author's position here to use later.
-            string position = GetOPDAndSQLData.FindAuthorPosition(author.first, author.last);
+            string position = author.position;
             //This list is to do a reverse comparison from author reported companies to the OPD to see if any companies did not 
             //Report a payment where the author did
             HashSet<String> companyHits = new HashSet<string>();
