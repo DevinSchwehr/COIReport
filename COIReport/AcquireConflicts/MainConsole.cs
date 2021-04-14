@@ -16,7 +16,7 @@ namespace RedcapApiDemo
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
         static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\OphthReal2.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\OphthRealTest2.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\OphthRealAuthor2.csv";
 
         static void Main(string[] args)
         {
@@ -35,7 +35,7 @@ namespace RedcapApiDemo
             
             Console.WriteLine("Successfully acquired Authors and Data Dictionary.");
             //foreach(Person author in authors)
-            for (int i = 0; i < authors.Count; i++)
+            for (int i = 486; i < authors.Count; i++)
             {
                 searchResults = new List<String[]>();
 
