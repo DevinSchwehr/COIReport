@@ -125,29 +125,29 @@ namespace AcquireData
             typeDictionary = new Dictionary<int, string>();
             AcquireJSONAndMetaData();
             String[] splitString = MetaDataResult.Split('"');
-            string[] degrees = splitString[3].Split('|');
-            //Have to do some special scenarios for degrees as there are values with commas within them
+            //string[] degrees = splitString[3].Split('|');
+            ////Have to do some special scenarios for degrees as there are values with commas within them
 
-            //TAKE ANOTHER LOOK AT THIS. It might no longer be necessary with the new way things are put in the OPD
-            foreach(string pair in degrees)
-            {
-                string[] splitPair = pair.Split(',');
-                if(splitPair.Length > 2)
-                {
-                    string ConcateValue = "";
-                    for(int counter = 1; counter <splitPair.Length; counter++)
-                    {
-                        ConcateValue += splitPair[counter];
-                    }
-                    clinicalDegrees.Add(int.Parse(splitPair[0]), ConcateValue);
-                }
-                else
-                {
-                clinicalDegrees.Add(int.Parse(splitPair[0]), splitPair[1]);
-                }
-            }
+            ////TAKE ANOTHER LOOK AT THIS. It might no longer be necessary with the new way things are put in the OPD
+            //foreach(string pair in degrees)
+            //{
+            //    string[] splitPair = pair.Split(',');
+            //    if(splitPair.Length > 2)
+            //    {
+            //        string ConcateValue = "";
+            //        for(int counter = 1; counter <splitPair.Length; counter++)
+            //        {
+            //            ConcateValue += splitPair[counter];
+            //        }
+            //        clinicalDegrees.Add(int.Parse(splitPair[0]), ConcateValue);
+            //    }
+            //    else
+            //    {
+            //    clinicalDegrees.Add(int.Parse(splitPair[0]), splitPair[1]);
+            //    }
+            //}
             //Repeating the same process for states, however it is easier as it will always fit into an array of 2 if you split on comma.
-            string[] states = splitString[9].Split('|');
+            string[] states = splitString[1].Split('|');
             foreach(string pair in states)
             {
                 string[] splitPair = pair.Split(",");
@@ -162,7 +162,7 @@ namespace AcquireData
             //    typeDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
             //}
             //Same deal for the past two, but with the companies.
-            string[] companies = splitString[21].Split('|');
+            string[] companies = splitString[5].Split('|');
             foreach (string pair in companies)
             {
                 string[] splitPair = pair.Split(',');

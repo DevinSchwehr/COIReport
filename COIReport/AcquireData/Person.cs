@@ -66,8 +66,8 @@ namespace AcquireData
             this.first = first.ToUpper();
             this.middle = middle.ToUpper();
             this.last = last.ToUpper();
-            this.clincalDegree = clinicaldegree;
-            this.otherDegree = freetextdegreeother;
+            //this.clincalDegree = clinicaldegree;
+            //this.otherDegree = freetextdegreeother;
             this.USLocation = uslocation;
             //this.institution = institution;
             this.cities = city.ToUpper();
@@ -75,7 +75,7 @@ namespace AcquireData
             //this.Involvement = type3;
             //this.otherInvolvement = freetexttypeother3;
             this.companiesNumbered = entity;
-            this.otherCompanies = freetextentityother3;
+            //this.otherCompanies = freetextentityother3;
             this.articleNumber = articlenumber;
             this.journal = journal;
             this.receiveddate = receiveddate;
@@ -98,8 +98,8 @@ namespace AcquireData
             first = BlankCheck(first, newAuthor.first);
             middle = BlankCheck(middle, newAuthor.middle);
             last = BlankCheck(last, newAuthor.last);
-            clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
-            otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
+           // clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
+            //otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
             USLocation = BlankCheck(USLocation, newAuthor.USLocation);
             //institution = BlankCheck(institution, newAuthor.institution);
             cities = OtherEntityCheck(cities, newAuthor.cities);
@@ -108,7 +108,7 @@ namespace AcquireData
            // Involvement = BlankCheck(Involvement, newAuthor.Involvement);
            // otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
             companiesNumbered = NumberEntityCheck(companiesNumbered, newAuthor.companiesNumbered);
-            otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
+           // otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
             receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);

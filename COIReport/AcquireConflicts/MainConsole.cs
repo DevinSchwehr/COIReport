@@ -187,7 +187,8 @@ namespace RedcapApiDemo
         static void AnalyzeOPDList(List<String[]> rows, Person author)
         {
             SortAlphabetically(rows);
-            List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
+            List<String> authorCompanies = new List<String>();
+            //List<String> authorCompanies = new List<String>(author.otherCompanies.Split(','));
             string[] authorNumberedCompanies = author.companiesNumbered.Split(',');
             //we find the author's position here to use later.
             string position = author.position;
