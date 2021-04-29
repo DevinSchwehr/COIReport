@@ -39,8 +39,8 @@ namespace AcquireData
             builder.AddUserSecrets<GetData>();
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
-            token = SelectedSecrets["JAMARealToken"];
-            reportID = SelectedSecrets["JAMARealDevinReportID"];
+            token = SelectedSecrets["IOVSRealToken"];
+            reportID = SelectedSecrets["IOVSRealDevinReport"];
             apiURL = SelectedSecrets["APIURL"];
 
             var redcap_api = new RedcapApi(apiURL);

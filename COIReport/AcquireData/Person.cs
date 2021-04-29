@@ -55,7 +55,7 @@ namespace AcquireData
         /// <param name="journal">the journal the article is in</param>
         /// <param name="receivedate">the date the journal was received</param>
         public Person(string authorshipnumber, string articlenumber, string last, string first, string uslocation, string clinicaldegree, string city, string state, string any_disclosures,
-            string entity, string freetextentityother3, string journal, string volume, string issue, string startpage, string pubyear, string pubmonth, string accepteddate, string title,
+            string entity, string freetextentityother3, string journal, string volume, string issue, string startpage, string pubyear, string pubmonth, string receiveddate, string title,
             string middle, string position, string freetextdegreeother)
         {
             try
@@ -78,7 +78,7 @@ namespace AcquireData
             this.otherCompanies = freetextentityother3;
             this.articleNumber = articlenumber;
             this.journal = journal;
-            this.receiveddate = accepteddate;
+            this.receiveddate = receiveddate;
             this.volume = volume;
             this.issue = issue;
             this.pubyear = pubyear;
