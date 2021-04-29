@@ -58,14 +58,18 @@ namespace AcquireData
             string entity, string freetextentityother3, string journal, string volume, string issue, string startpage, string pubyear, string pubmonth, string accepteddate, string title,
             string middle, string position, string freetextdegreeother)
         {
+            try
+            {
             this.authorshipNumber = int.Parse(authorshipnumber);
+            }
+            catch(Exception e) { Console.WriteLine(e); }
             this.first = first.ToUpper();
             this.middle = middle.ToUpper();
             this.last = last.ToUpper();
             this.clincalDegree = clinicaldegree;
             this.otherDegree = freetextdegreeother;
             this.USLocation = uslocation;
-            this.institution = institution;
+            //this.institution = institution;
             this.cities = city.ToUpper();
             this.states = state;
             //this.Involvement = type3;
@@ -97,7 +101,7 @@ namespace AcquireData
             clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
             otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
             USLocation = BlankCheck(USLocation, newAuthor.USLocation);
-            institution = BlankCheck(institution, newAuthor.institution);
+            //institution = BlankCheck(institution, newAuthor.institution);
             cities = OtherEntityCheck(cities, newAuthor.cities);
             if(!(newAuthor.states.Equals(""))) { states += newAuthor.states + ','; }
            // states = NumberEntityCheck(states, newAuthor.states);
@@ -127,6 +131,8 @@ namespace AcquireData
         /// <returns></returns>
         private string BlankCheck(string currentVariable, string newVariable)
         {
+            //if(newVariable == null) { return currentVariable; }
+            //if(currentVariable == null && newVariable != null) { currentVariable = newVariable; }
             if(currentVariable.Equals("") && !(newVariable.Equals("")))
             {
                 return newVariable;

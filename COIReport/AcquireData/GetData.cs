@@ -40,12 +40,12 @@ namespace AcquireData
             IConfigurationRoot Configuration = builder.Build();
             var SelectedSecrets = Configuration.GetSection("COIReportDevinSecrets");
             token = SelectedSecrets["JAMARealToken"];
-            reportID = SelectedSecrets["JamaRealDevinReportID"];
+            reportID = SelectedSecrets["JAMARealDevinReportID"];
             apiURL = SelectedSecrets["APIURL"];
 
             var redcap_api = new RedcapApi(apiURL);
 
-            string[] metadataFields = { "clinicaldegree", "entity3", "state", "type3" };
+            string[] metadataFields = { "clinicaldegree", "entity", "state" };
 
             //This is all of the RedCapData, including the data dictionary!
             RedCapResult = redcap_api.ExportReportsAsync(token, int.Parse(reportID), Redcap.Models.ReturnFormat.json).Result;
@@ -154,16 +154,16 @@ namespace AcquireData
                 stateDictionary.Add(int.Parse(splitPair[0]), GetStateAbbreviation(splitPair[1]));
             }
             //Same routine as was used for states, but for the types of involvement with companies.
-            string allTypes = splitString[21] + splitString[23] + splitString[25];
-            string[] types = allTypes.Split('|');
-            foreach(string pair in types)
-            {
-                string[] splitPair = pair.Split(',');
-                typeDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
-            }
+            //string allTypes = splitString[21] + splitString[23] + splitString[25];
+            //string[] types = allTypes.Split('|');
+            //foreach(string pair in types)
+            //{
+            //    string[] splitPair = pair.Split(',');
+            //    typeDictionary.Add(int.Parse(splitPair[0]), splitPair[1]);
+            //}
             //Same deal for the past two, but with the companies.
-            string[] companies = splitString[37].Split('|');
-            foreach(string pair in companies)
+            string[] companies = splitString[21].Split('|');
+            foreach (string pair in companies)
             {
                 string[] splitPair = pair.Split(',');
                 splitPair[1] = TypoCheck(splitPair[1]);
