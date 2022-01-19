@@ -15,8 +15,8 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
-        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\IOVSReal.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\IOVSRealAuthor.csv";
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\AJORealImoproved.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\AJORealAuthorImproved.csv";
 
         static void Main(string[] args)
         {
@@ -250,28 +250,29 @@ namespace RedcapApiDemo
             
             
             //As we find hits, we remove them from the company list.
-                foreach(string hit in companyHits)
-                {
-                    authorCompanies.Remove(hit);
-                }
-                //If there are any companies left, then there are companies the author reported that were not found within the OPD
-                if(authorCompanies.Count > 0)
-                {
-                    //These checks are for the Bausch/Valeant Check detailed above. This is so that the output doesn't say 
-                    if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
-                    if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
-
-                //foreach(string company in authorCompanies)
-                //{
-                //    if (!company.Equals("Other") && !(company.Equals("")))
-                //    {
-                //    Console.WriteLine($"DISCREPANCY: author reported company {company}, but said company was either not found within the OPD or payments were not found within the time range.");
-                //    }
-                //}
-                string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Found", author.cities.Replace(',',';'), author.states.Replace(',',';'), String.Join(';', authorCompanies), position, author.articleNumber, author.journal, author.receiveddate, GetOPDAndSQLData.PhysicianID };
-                    OutputToCSV(row, authoroutputFilePath);
-                }
-           // }
+            foreach(string hit in companyHits)
+            {
+                authorCompanies.Remove(hit);
+            }
+            //If there are any companies left, then there are companies the author reported that were not found within the OPD
+            //if(authorCompanies.Count > 0)
+            //{
+                //These checks are for the Bausch/Valeant Check detailed above. This is so that the output doesn't say 
+            if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
+            if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
+            //authorCompanies.Remove("Other");
+            //authorCompanies.Remove("");
+        //foreach(string company in authorcompanies)
+        //{
+        //    if (!company.equals("other") && !(company.equals("")))
+        //    {
+        //    console.writeline($"discrepancy: author reported company {company}, but said company was either not found within the opd or payments were not found within the time range.");
+        //    }
+        //}
+            string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Found", author.cities.Replace(',',';'), author.states.Replace(',',';'), String.Join(';', authorCompanies), position, author.articleNumber, author.journal, author.receiveddate, GetOPDAndSQLData.PhysicianID};
+            OutputToCSV(row, authoroutputFilePath);
+            //}
+        // }
         }
 
         private static string[] FormCSVLine(Person author, string[] OPDEntry, string disclosure, string position)

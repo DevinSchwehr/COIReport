@@ -75,7 +75,7 @@ namespace AcquireData
             //this.Involvement = type3;
             //this.otherInvolvement = freetexttypeother3;
             this.companiesNumbered = entity;
-            //this.otherCompanies = freetextentityother3;
+            this.otherCompanies = freetextentityother3;
             this.articleNumber = articlenumber;
             this.journal = journal;
             this.receiveddate = receiveddate;
@@ -108,12 +108,12 @@ namespace AcquireData
            // Involvement = BlankCheck(Involvement, newAuthor.Involvement);
            // otherInvolvement = BlankCheck(otherInvolvement, newAuthor.otherInvolvement);
             companiesNumbered = NumberEntityCheck(companiesNumbered, newAuthor.companiesNumbered);
-           // otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
+            otherCompanies = OtherEntityCheck(otherCompanies, newAuthor.otherCompanies);
             articleNumber = BlankCheck(articleNumber, newAuthor.articleNumber);
             journal = BlankCheck(journal, newAuthor.journal);
             receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);
             volume = BlankCheck(volume, newAuthor.volume);
-            issue = BlankCheck(issue, newAuthor.issue);
+            //issue = BlankCheck(issue, newAuthor.issue);
             pubyear = BlankCheck(pubyear, newAuthor.pubyear);
             pubmonth = BlankCheck(pubmonth, newAuthor.pubmonth);
             articleTitle = BlankCheck(articleTitle, newAuthor.articleTitle);
