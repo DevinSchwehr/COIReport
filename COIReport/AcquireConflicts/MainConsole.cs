@@ -15,8 +15,8 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
-        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMAReal2.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMARealAuthor2.csv";
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMARealJan2022.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\JAMARealAuthorJan2022.csv";
 
         static void Main(string[] args)
         {
@@ -254,11 +254,11 @@ namespace RedcapApiDemo
                     authorCompanies.Remove(hit);
                 }
                 //If there are any companies left, then there are companies the author reported that were not found within the OPD
-                if(authorCompanies.Count > 0)
-                {
+                //if(authorCompanies.Count > 0)
+                //{
                     //These checks are for the Bausch/Valeant Check detailed above. This is so that the output doesn't say 
-                    if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
-                    if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
+                if(authorCompanies.Contains("Bausch") && companyHits.Contains("Valeant")) { authorCompanies.Remove("Bausch"); }
+                if(authorCompanies.Contains("Valeant") && companyHits.Contains("Bausch")) { authorCompanies.Remove("Valeant"); }
 
                 //foreach(string company in authorCompanies)
                 //{
@@ -269,7 +269,7 @@ namespace RedcapApiDemo
                 //}
                 string[] row = { author.first, author.last, author.authorshipNumber.ToString(), "Found", author.cities.Replace(',',';'), author.states.Replace(',',';'), String.Join(';', authorCompanies), position, author.articleNumber, author.journal, author.receiveddate, GetOPDAndSQLData.PhysicianID };
                     OutputToCSV(row, authoroutputFilePath);
-                }
+                //}
            // }
         }
 

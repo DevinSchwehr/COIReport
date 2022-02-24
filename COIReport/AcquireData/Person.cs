@@ -66,8 +66,8 @@ namespace AcquireData
             this.first = first.ToUpper();
             this.middle = middle.ToUpper();
             this.last = last.ToUpper();
-            this.clincalDegree = clinicaldegree;
-            this.otherDegree = freetextdegreeother;
+            //this.clincalDegree = clinicaldegree;
+            //this.otherDegree = freetextdegreeother;
             this.USLocation = uslocation;
             //this.institution = institution;
             this.cities = city.ToUpper();
@@ -98,8 +98,8 @@ namespace AcquireData
             first = BlankCheck(first, newAuthor.first);
             middle = BlankCheck(middle, newAuthor.middle);
             last = BlankCheck(last, newAuthor.last);
-            clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
-            otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
+            //clincalDegree = BlankCheck(clincalDegree, newAuthor.clincalDegree);
+            //otherDegree = BlankCheck(otherDegree, newAuthor.otherDegree);
             USLocation = BlankCheck(USLocation, newAuthor.USLocation);
             //institution = BlankCheck(institution, newAuthor.institution);
             cities = OtherEntityCheck(cities, newAuthor.cities);
@@ -113,7 +113,7 @@ namespace AcquireData
             journal = BlankCheck(journal, newAuthor.journal);
             receiveddate = BlankCheck(receiveddate, newAuthor.receiveddate);
             volume = BlankCheck(volume, newAuthor.volume);
-            issue = BlankCheck(issue, newAuthor.issue);
+            //issue = BlankCheck(issue, newAuthor.issue);
             pubyear = BlankCheck(pubyear, newAuthor.pubyear);
             pubmonth = BlankCheck(pubmonth, newAuthor.pubmonth);
             articleTitle = BlankCheck(articleTitle, newAuthor.articleTitle);
@@ -131,9 +131,9 @@ namespace AcquireData
         /// <returns></returns>
         private string BlankCheck(string currentVariable, string newVariable)
         {
-            //if(newVariable == null) { return currentVariable; }
-            //if(currentVariable == null && newVariable != null) { currentVariable = newVariable; }
-            if(currentVariable.Equals("") && !(newVariable.Equals("")))
+            //if (newVariable == null) { return currentVariable; }
+            //if (currentVariable == null && newVariable != null) { currentVariable = newVariable; }
+            if (currentVariable.Equals("") && !(newVariable.Equals("")))
             {
                 return newVariable;
             }
