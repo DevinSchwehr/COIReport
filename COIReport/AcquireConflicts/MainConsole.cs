@@ -15,13 +15,15 @@ namespace RedcapApiDemo
         static List<Person> authors;
         static List<String[]> searchResults = new List<String[]>();
         static string companyHitString; 
-        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\AJORealImoproved.csv";
-        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\AJORealAuthorImproved.csv";
+        static string companyOutputFilePath = @"D:\Users\u1205752\Documents\COI\MissingAuthorsCompanyAJO.csv";
+        static string authoroutputFilePath = @"D:\Users\u1205752\Documents\COI\MissingAuthorsAJO.csv";
 
         static void Main(string[] args)
         {
             Console.WriteLine("Hello! Welcome to the OPD searcher.");
             Console.WriteLine("Attempting to acquire report and data dictionary");
+
+            Dictionary<int, int> authorshipToID = getPhysicianIDs(@"D:\Users\u1205752\Documents\COI\PhysicianIDs.csv");
             try
             {
                 //Here we get all of the authors from the RedCap report.
@@ -40,6 +42,10 @@ namespace RedcapApiDemo
                 searchResults = new List<String[]>();
 
                 Person author = authors[i];
+
+                if(!authorshipToID.ContainsKey(author.authorshipNumber)) { continue; }
+
+                GetOPDAndSQLData.PhysicianID = authorshipToID[author.authorshipNumber].ToString();
 
                  Console.WriteLine("Author #" + (i + 1) + ": " + author.first + " " + author.last + " - " + author.cities + "," + author.states + " Authorship #: " + author.authorshipNumber + " Receive Date: " + author.receiveddate);
                 //Console.WriteLine(author.first + " " + author.last + " - " + author.city + "," + GetData.stateDictionary[int.Parse(author.state)]);
@@ -170,6 +176,21 @@ namespace RedcapApiDemo
                 }
                 writer.Write(Environment.NewLine);
             }
+        }
+
+        static Dictionary<int,int> getPhysicianIDs(string filePath)
+        {
+            Dictionary<int, int> dict = new Dictionary<int, int>();
+            using(var reader = new StreamReader(filePath))
+            {
+                reader.ReadLine();
+                while (!reader.EndOfStream)
+                {
+                    var values = reader.ReadLine().Split(',');
+                    dict.Add(int.Parse(values[0]), int.Parse(values[values.Length - 1]));
+                }
+            }
+            return dict;
         }
 
         /// <summary>
